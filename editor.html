@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CodeCollab — Editor</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/editor.css">
+</head>
+<body class="editor-page">
+  <nav class="navbar">
+    <div class="nav-brand">
+      <span class="logo">&#60;/&#62;</span>
+      <span class="brand-name">CodeCollab</span>
+    </div>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="editor.html" class="active">Editor</a></li>
+      <li><a href="chat.html">Chat</a></li>
+    </ul>
+  </nav>
+
+  <div class="editor-layout">
+    <!-- Sidebar: File Explorer -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h3>Files</h3>
+        <button class="btn-icon" id="newFileBtn" title="New File">+</button>
+      </div>
+      <ul class="file-tree" id="fileTree">
+        <li class="file-item active" data-file="index.js">
+          <span class="file-icon">&#128196;</span> index.js
+        </li>
+        <li class="file-item" data-file="styles.css">
+          <span class="file-icon">&#127912;</span> styles.css
+        </li>
+        <li class="file-item" data-file="readme.md">
+          <span class="file-icon">&#128209;</span> readme.md
+        </li>
+      </ul>
+      <div class="sidebar-section">
+        <h4>Collaborators</h4>
+        <div class="collaborators">
+          <div class="avatar" style="background-color: #6366f1;" title="You">Y</div>
+          <div class="avatar" style="background-color: #ec4899;" title="Alice">A</div>
+          <div class="avatar" style="background-color: #f59e0b;" title="Bob">B</div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Editor Area -->
+    <main class="editor-main">
+      <div class="editor-tabs">
+        <div class="tab active" data-file="index.js">index.js <span class="tab-close">&times;</span></div>
+      </div>
+      <div class="editor-container">
+        <div class="line-numbers" id="lineNumbers"></div>
+        <textarea
+          id="codeEditor"
+          class="code-input"
+          spellcheck="false"
+          placeholder="Start typing your code..."
+        >// Welcome to CodeCollab!
+// Start coding and collaborate in real time.
+
+function greet(name) {
+  return `Hello, ${name}! Welcome to CodeCollab.`;
+}
+
+const users = ["Alice", "Bob", "Charlie"];
+
+users.forEach(user => {
+  console.log(greet(user));
+});
+
+// Try editing this code — your collaborators
+// will see changes in real time!</textarea>
+      </div>
+      <div class="editor-status">
+        <span class="status-item">JavaScript</span>
+        <span class="status-item">UTF-8</span>
+        <span class="status-item" id="cursorPos">Ln 1, Col 1</span>
+        <span class="status-item status-right">
+          <span class="status-dot online"></span> 3 online
+        </span>
+      </div>
+    </main>
+
+    <!-- Right Panel: Mini Chat -->
+    <aside class="mini-chat">
+      <div class="mini-chat-header">
+        <h4>Team Chat</h4>
+        <a href="chat.html" class="expand-link" title="Open full chat">&#8599;</a>
+      </div>
+      <div class="mini-chat-messages" id="miniChatMessages">
+        <div class="mini-msg">
+          <strong class="msg-user" style="color: #ec4899;">Alice</strong>
+          <span>Hey! I fixed the header bug.</span>
+        </div>
+        <div class="mini-msg">
+          <strong class="msg-user" style="color: #f59e0b;">Bob</strong>
+          <span>Nice, merging now.</span>
+        </div>
+      </div>
+      <div class="mini-chat-input">
+        <input type="text" id="miniChatInput" placeholder="Message..." />
+        <button id="miniChatSend" class="btn-icon">&#10148;</button>
+      </div>
+    </aside>
+  </div>
+
+  <script src="js/editor.js"></script>
+</body>
+</html>

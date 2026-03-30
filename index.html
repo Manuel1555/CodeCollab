@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CodeCollab — Code Together, Build Together</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/landing.css">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-brand">
+      <span class="logo">&#60;/&#62;</span>
+      <span class="brand-name">CodeCollab</span>
+    </div>
+    <ul class="nav-links">
+      <li><a href="index.html" class="active">Home</a></li>
+      <li><a href="editor.html">Editor</a></li>
+      <li><a href="chat.html">Chat</a></li>
+    </ul>
+  </nav>
+
+  <main class="landing">
+    <section class="hero">
+      <div class="hero-content">
+        <h1>Code Together,<br>Build Together</h1>
+        <p class="hero-subtitle">
+          A real-time collaborative code editor with built-in chat.
+          Write, review, and ship code with your team — all in the browser.
+        </p>
+        <div class="hero-actions">
+          <a href="editor.html" class="btn btn-primary">Open Editor</a>
+          <a href="chat.html" class="btn btn-secondary">Join Chat</a>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="code-window">
+          <div class="window-bar">
+            <span class="dot red"></span>
+            <span class="dot yellow"></span>
+            <span class="dot green"></span>
+            <span class="window-title">app.js</span>
+          </div>
+          <pre class="code-preview"><code><span class="kw">function</span> <span class="fn">collaborate</span>() {
+  <span class="kw">const</span> team = <span class="str">"awesome"</span>;
+  <span class="kw">return</span> team.<span class="fn">build</span>(ideas);
+}</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <section class="features">
+      <h2>Why CodeCollab?</h2>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <div class="feature-icon">&#9998;</div>
+          <h3>Live Editing</h3>
+          <p>See changes in real time as your teammates type. Syntax highlighting for multiple languages.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">&#128172;</div>
+          <h3>Built-in Chat</h3>
+          <p>Discuss code without switching tabs. Mention teammates and share snippets inline.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">&#127912;</div>
+          <h3>Themes &amp; Customization</h3>
+          <p>Choose from dark, light, or high-contrast themes. Customize fonts and key bindings.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">&#128640;</div>
+          <h3>Fast &amp; Lightweight</h3>
+          <p>No heavy frameworks. Pure HTML, CSS, and JavaScript — loads instantly.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="cta">
+      <h2>Ready to start coding?</h2>
+      <p>Jump into the editor and start building with your team.</p>
+      <a href="editor.html" class="btn btn-primary">Get Started</a>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>&copy; 2026 CodeCollab. Built for developers, by developers.</p>
+  </footer>
+</body>
+</html>
