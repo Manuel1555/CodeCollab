@@ -1,102 +1,927 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CodeCollab — Code Together, Build Together</title>
-  <link rel="stylesheet" href="css/styles.css">
-  <link rel="stylesheet" href="css/landing.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lamp Login</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0c1520;
+  --card: #111c2c;
+  --green: #50c85a;
+  --green2: #7de07a;
+  --green-glow: rgba(80,200,90,0.35);
+  --text: #dff0df;
+  --muted: #5a8060;
+  --input-bg: #09111d;
+  --border: rgba(80,200,90,0.12);
+}
+
+html, body {
+  width: 100%; height: 100%;
+  background: var(--bg);
+  font-family: 'Nunito', sans-serif;
+  overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* Animated star field */
+#stars {
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  overflow: hidden;
+}
+.star {
+  position: absolute;
+  background: #fff;
+  border-radius: 50%;
+  animation: twinkle var(--d) ease-in-out infinite;
+}
+@keyframes twinkle {
+  0%,100% { opacity: var(--min); }
+  50% { opacity: var(--max); }
+}
+
+#app {
+  position: relative; z-index: 1;
+  display: flex; align-items: center; gap: 0;
+  width: min(720px, 96vw);
+}
+
+/* ── LEFT: canvas ── */
+#left {
+  flex: 0 0 290px;
+  height: 440px;
+  position: relative;
+  user-select: none;
+}
+#lamp-canvas {
+  display: block;
+  width: 290px; height: 440px;
+}
+
+/* ── RIGHT: login card ── */
+#card {
+  flex: 1;
+  background: var(--card);
+  border-radius: 22px;
+  padding: 42px 38px;
+  border: 1.5px solid var(--border);
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.8s, box-shadow 0.8s;
+}
+#card::before {
+  content: '';
+  position: absolute; inset: 0;
+  border-radius: 22px;
+  background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(80,200,90,0.07), transparent 70%);
+  opacity: 0;
+  transition: opacity 0.8s;
+  pointer-events: none;
+}
+body.on #card {
+  border-color: rgba(80,200,90,0.45);
+  box-shadow: 0 0 50px rgba(80,200,90,0.18), 0 0 100px rgba(80,200,90,0.06);
+}
+body.on #card::before { opacity: 1; }
+
+/* Neon corner accents */
+#card::after {
+  content: '';
+  position: absolute;
+  top: -1px; left: -1px; right: -1px; bottom: -1px;
+  border-radius: 22px;
+  background: none;
+  box-shadow: inset 0 0 0 1.5px transparent;
+  pointer-events: none;
+  transition: box-shadow 0.8s;
+}
+body.on #card::after {
+  box-shadow: inset 0 0 0 1.5px rgba(80,200,90,0.2);
+}
+
+h1 {
+  color: var(--text);
+  font-size: 26px; font-weight: 800;
+  margin-bottom: 28px;
+  text-align: center;
+  letter-spacing: -0.3px;
+}
+
+.field { margin-bottom: 18px; }
+label {
+  display: block;
+  color: var(--muted);
+  font-size: 12px; font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 7px;
+}
+input {
+  width: 100%;
+  background: var(--input-bg);
+  border: 1.5px solid rgba(255,255,255,0.07);
+  border-radius: 11px;
+  padding: 12px 15px;
+  color: var(--text);
+  font-family: 'Nunito', sans-serif;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.3s, box-shadow 0.3s;
+  -webkit-appearance: none;
+}
+input::placeholder { color: rgba(255,255,255,0.18); }
+input:focus {
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(80,200,90,0.14);
+}
+
+#login-btn {
+  width: 100%;
+  margin-top: 6px;
+  padding: 14px;
+  background: linear-gradient(135deg, var(--green), var(--green2));
+  border: none; border-radius: 11px;
+  color: #fff;
+  font-family: 'Nunito', sans-serif;
+  font-size: 15px; font-weight: 800;
+  cursor: pointer;
+  position: relative; overflow: hidden;
+  transition: transform 0.15s, box-shadow 0.3s, filter 0.3s;
+  letter-spacing: 0.3px;
+}
+#login-btn::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(255,255,255,0.15) 0%, transparent 60%);
+  pointer-events: none;
+}
+#login-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 28px rgba(80,200,90,0.5);
+  filter: brightness(1.08);
+}
+#login-btn:active { transform: scale(0.97); }
+
+#ripple-container {
+  position: absolute; inset: 0; pointer-events: none; overflow: hidden; border-radius: 11px;
+}
+.ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.3);
+  transform: scale(0);
+  animation: ripple-anim 0.55s ease-out forwards;
+}
+@keyframes ripple-anim {
+  to { transform: scale(4); opacity: 0; }
+}
+
+.forgot {
+  text-align: center; margin-top: 14px;
+  color: var(--muted); font-size: 13px;
+  cursor: pointer;
+  transition: color 0.2s;
+  display: block;
+}
+.forgot:hover { color: var(--green); }
+
+/* Hint tooltip */
+#hint {
+  position: absolute;
+  bottom: 28px; left: 50%;
+  transform: translateX(-50%);
+  color: rgba(100,160,100,0.5);
+  font-size: 11px; font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  animation: hintpulse 2.5s ease-in-out infinite;
+  pointer-events: none;
+  opacity: 1; transition: opacity 0.5s;
+}
+body.on #hint { opacity: 0; }
+@keyframes hintpulse {
+  0%,100% { opacity: 0.3; }
+  50% { opacity: 0.7; }
+}
+
+/* Ambient page glow */
+#glow-overlay {
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background: radial-gradient(ellipse 50% 70% at 30% 60%, rgba(60,170,70,0.07), transparent);
+  opacity: 0; transition: opacity 1.2s;
+}
+body.on #glow-overlay { opacity: 1; }
+</style>
 </head>
 <body>
-  <div id="stars"></div>
-  <div class="glow-overlay"></div>
 
-  <nav class="navbar">
-    <div class="nav-brand">
-      <span class="logo">&lt;/&gt;</span>
-      <span class="brand-name">CodeCollab</span>
+<div id="stars"></div>
+<div id="glow-overlay"></div>
+
+<div id="app">
+  <!-- LAMP CANVAS -->
+  <div id="left">
+    <canvas id="lamp-canvas" width="290" height="440"></canvas>
+    <div id="hint">↓ pull the cord ↓</div>
+  </div>
+
+  <!-- LOGIN CARD -->
+  <div id="card">
+    <h1>Welcome Back</h1>
+    <div class="field">
+      <label>Username</label>
+      <input type="text" id="inp-user" placeholder="Enter your username" autocomplete="off">
     </div>
-    <ul class="nav-links">
-      <li><a href="index.html" class="active">Home</a></li>
-      <li><a href="editor.html">Editor</a></li>
-      <li><a href="chat.html">Chat</a></li>
-    </ul>
-  </nav>
+    <div class="field">
+      <label>Password</label>
+      <input type="password" id="inp-pass" placeholder="Enter your password" autocomplete="off">
+    </div>
+    <button id="login-btn">
+      Login
+      <div id="ripple-container"></div>
+    </button>
+    <a class="forgot">Forgot Password?</a>
+  </div>
+</div>
 
-  <main class="landing">
-    <section class="hero">
-      <div class="hero-text">
-        <h1>Code Together,<br>Build Together</h1>
-        <p class="hero-subtitle">A real-time collaborative editor with built-in team chat. Write, review, and ship code with your team — all in one place.</p>
-        <div class="hero-actions">
-          <a href="editor.html" class="btn btn-primary">Open Editor</a>
-          <a href="chat.html" class="btn btn-secondary">Join Chat</a>
-        </div>
-      </div>
+<script>
+/* ═══════════════════════════════════════════════════
+   STARS
+═══════════════════════════════════════════════════ */
+const starsEl = document.getElementById('stars');
+for (let i = 0; i < 80; i++) {
+  const s = document.createElement('div');
+  s.className = 'star';
+  const size = Math.random() * 2 + 0.5;
+  s.style.cssText = `
+    width:${size}px; height:${size}px;
+    left:${Math.random()*100}%; top:${Math.random()*100}%;
+    --d:${2 + Math.random()*4}s;
+    --min:${0.05 + Math.random()*0.1};
+    --max:${0.3 + Math.random()*0.5};
+    animation-delay:${Math.random()*4}s;
+  `;
+  starsEl.appendChild(s);
+}
 
-      <div class="mascot-wrapper">
-        <div class="mascot">
-          <div class="lamp-shade">
-            <div class="lamp-shade-top"></div>
-            <div class="lamp-face">
-              <div class="lamp-eyes">
-                <div class="lamp-eye"></div>
-                <div class="lamp-eye"></div>
-              </div>
-              <div class="lamp-mouth"></div>
-              <div class="lamp-cheeks">
-                <div class="lamp-cheek"></div>
-                <div class="lamp-cheek"></div>
-              </div>
-            </div>
-          </div>
-          <div class="lamp-pole"></div>
-          <div class="lamp-base"></div>
-          <div class="lamp-light-cone"></div>
-          <div class="lamp-cord">
-            <div class="lamp-cord-knob"></div>
-          </div>
-        </div>
-      </div>
-    </section>
+/* ═══════════════════════════════════════════════════
+   CANVAS & STATE
+═══════════════════════════════════════════════════ */
+const canvas = document.getElementById('lamp-canvas');
+const ctx = canvas.getContext('2d');
+const W = 290, H = 440;
 
-    <section class="features">
-      <h2>Everything You Need</h2>
-      <div class="feature-grid">
-        <div class="feature-card">
-          <div class="feature-icon">&#9998;</div>
-          <h3>Live Editor</h3>
-          <p>Write code with syntax highlighting, tab support, and a multi-file workspace.</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon">&#128172;</div>
-          <h3>Team Chat</h3>
-          <p>Channel-based messaging with code block support and direct messages.</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon">&#128101;</div>
-          <h3>Collaborate</h3>
-          <p>Work on the same files together in real time. See changes as they happen.</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon">&#127912;</div>
-          <h3>Dark Theme</h3>
-          <p>Easy on the eyes with a beautiful cartoon-themed dark interface.</p>
-        </div>
-      </div>
-    </section>
+let lampOn = false;
+let T = 0;           // 0→1 smooth transition
+let squish = 0;      // lamp bounce squish
+let squishV = 0;
+let toggleFlash = 0; // flash when toggling
 
-    <section class="cta">
-      <h2>Ready to Code?</h2>
-      <p>Jump into the editor and start building with your team.</p>
-      <a href="editor.html" class="btn btn-primary">Get Started</a>
-    </section>
-  </main>
+/* ═══════════════════════════════════════════════════
+   LAMP GEOMETRY
+═══════════════════════════════════════════════════ */
+const LX = 135;          // lamp center X
 
-  <footer class="footer">
-    &copy; 2025 CodeCollab. Built with love and pixels.
-  </footer>
+const SHADE_TOP_Y  = 62;
+const SHADE_BOT_Y  = 168;
+const SHADE_TOP_W  = 42;
+const SHADE_BOT_W  = 88;
+const SHADE_MID_W  = 72;
 
-  <script src="js/stars.js"></script>
+const POLE_W       = 13;
+const POLE_TOP_Y   = SHADE_BOT_Y - 4;
+const POLE_BOT_Y   = 305;
+const BASE_Y       = 314;
+const BASE_RX      = 52;
+const BASE_RY      = 10;
+
+// Rope anchor: inner right of shade, near pole
+const ANCHOR_X = LX + 8;
+const ANCHOR_Y = SHADE_BOT_Y - 22;
+
+/* ═══════════════════════════════════════════════════
+   ROPE PHYSICS  (Verlet + constraint relaxation)
+═══════════════════════════════════════════════════ */
+const N_SEG   = 20;
+const SEG_LEN = 8.8;
+const GRAVITY = 0.34;
+const DAMPING = 0.982;
+const ITERS   = 30;
+
+let pts = [];
+
+function initRope() {
+  pts = [];
+  for (let i = 0; i <= N_SEG; i++) {
+    const y = ANCHOR_Y + i * SEG_LEN;
+    pts.push({
+      x: ANCHOR_X, y,
+      px: ANCHOR_X, py: y - 0.4,
+      fixed: i === 0
+    });
+  }
+}
+initRope();
+
+function stepRope() {
+  // Verlet integration
+  for (const p of pts) {
+    if (p.fixed || p === dragPt) continue;
+    const vx = (p.x - p.px) * DAMPING;
+    const vy = (p.y - p.py) * DAMPING;
+    p.px = p.x; p.py = p.y;
+    p.x += vx;
+    p.y += vy + GRAVITY;
+  }
+
+  // Constraint relaxation
+  for (let k = 0; k < ITERS; k++) {
+    pts[0].x = ANCHOR_X;
+    pts[0].y = ANCHOR_Y;
+
+    for (let i = 0; i < pts.length - 1; i++) {
+      const a = pts[i], b = pts[i+1];
+      const dx = b.x - a.x, dy = b.y - a.y;
+      const d  = Math.hypot(dx, dy) || 1e-9;
+      const f  = (d - SEG_LEN) / d * 0.5;
+
+      if (!a.fixed && a !== dragPt) {
+        a.x += dx * f;
+        a.y += dy * f;
+      }
+      if (!b.fixed && b !== dragPt) {
+        b.x -= dx * f;
+        b.y -= dy * f;
+      }
+    }
+  }
+}
+
+/* ═══════════════════════════════════════════════════
+   DRAG INTERACTION
+═══════════════════════════════════════════════════ */
+let dragPt    = null;
+let dragStartY = 0;
+let knobDelta  = 0;
+let mx = -999, my = -999;  // last mouse pos (canvas coords)
+
+const knob = () => pts[pts.length - 1];
+
+function canvasXY(e) {
+  const r  = canvas.getBoundingClientRect();
+  const sx = W / r.width, sy = H / r.height;
+  const cx = e.touches ? e.touches[0].clientX : e.clientX;
+  const cy = e.touches ? e.touches[0].clientY : e.clientY;
+  return { x: (cx - r.left)*sx, y: (cy - r.top)*sy };
+}
+
+function nearKnob(x, y) {
+  const k = knob();
+  return Math.hypot(x - k.x, y - k.y) < 24;
+}
+
+// Mouse
+canvas.addEventListener('mousedown', e => {
+  const p = canvasXY(e);
+  if (nearKnob(p.x, p.y)) {
+    dragPt = knob();
+    dragStartY = dragPt.y;
+    knobDelta  = 0;
+    canvas.style.cursor = 'grabbing';
+  }
+});
+canvas.addEventListener('mousemove', e => {
+  const p = canvasXY(e);
+  mx = p.x; my = p.y;
+  if (dragPt) {
+    dragPt.x = p.x;
+    dragPt.y = p.y;
+    knobDelta = p.y - dragStartY;
+  } else {
+    canvas.style.cursor = nearKnob(p.x, p.y) ? 'grab' : 'default';
+  }
+});
+canvas.addEventListener('mouseup', () => {
+  if (dragPt) {
+    if (knobDelta > 28) toggle();
+    const k = knob();
+    k.py = k.y + 10; // give a kick upward
+    dragPt = null;
+  }
+  canvas.style.cursor = 'default';
+});
+canvas.addEventListener('mouseleave', () => { dragPt = null; });
+
+canvas.addEventListener('dblclick', () => {
+  for (let i = 0; i < 3; i++) {
+    setTimeout(() => {
+      spawnParticles();
+      toggleFlash = Math.max(toggleFlash, 0.7);
+    }, i * 90);
+  }
+});
+
+// Touch
+canvas.addEventListener('touchstart', e => {
+  e.preventDefault();
+  const p = canvasXY(e);
+  if (nearKnob(p.x, p.y)) {
+    dragPt = knob();
+    dragStartY = dragPt.y;
+    knobDelta  = 0;
+  }
+}, { passive: false });
+canvas.addEventListener('touchmove', e => {
+  e.preventDefault();
+  if (!dragPt) return;
+  const p = canvasXY(e);
+  dragPt.x = p.x; dragPt.y = p.y;
+  knobDelta = p.y - dragStartY;
+}, { passive: false });
+canvas.addEventListener('touchend', () => {
+  if (dragPt) {
+    if (knobDelta > 28) toggle();
+    const k = knob();
+    k.py = k.y + 10;
+    dragPt = null;
+  }
+});
+
+/* ═══════════════════════════════════════════════════
+   TOGGLE
+═══════════════════════════════════════════════════ */
+function toggle() {
+  lampOn = !lampOn;
+  document.body.classList.toggle('on', lampOn);
+  squish   = 0.22;
+  squishV  = -0.06;
+  toggleFlash = 1;
+  spawnParticles();
+  if (lampOn) {
+    spawnParticles();
+    setTimeout(spawnParticles, 120);
+  }
+}
+
+/* ═══════════════════════════════════════════════════
+   PARTICLES  (sparkles on toggle)
+═══════════════════════════════════════════════════ */
+let particles = [];
+function spawnParticles() {
+  const cx = LX, cy = SHADE_BOT_Y + 10;
+  for (let i = 0; i < 20; i++) {
+    const angle = Math.random() * Math.PI * 2;
+    const speed = 1.5 + Math.random() * 3;
+    particles.push({
+      x: cx, y: cy,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed - 1,
+      life: 1, decay: 0.025 + Math.random() * 0.02,
+      r: 1.5 + Math.random() * 2.5
+    });
+  }
+}
+function updateParticles() {
+  particles = particles.filter(p => p.life > 0);
+  for (const p of particles) {
+    p.x += p.vx; p.y += p.vy;
+    p.vy += 0.06;
+    p.vx *= 0.97; p.vy *= 0.97;
+    p.life -= p.decay;
+  }
+}
+
+/* ═══════════════════════════════════════════════════
+   COLOR UTILS
+═══════════════════════════════════════════════════ */
+function lerp(a, b, t) { return a + (b - a) * t; }
+function ease(t) { return t < .5 ? 2*t*t : -1+(4-2*t)*t; }
+function lc(a, b, t) {
+  return [
+    Math.round(lerp(a[0],b[0],t)),
+    Math.round(lerp(a[1],b[1],t)),
+    Math.round(lerp(a[2],b[2],t))
+  ];
+}
+const rgb  = c => `rgb(${c[0]},${c[1]},${c[2]})`;
+const rgba = (c,a) => `rgba(${c[0]},${c[1]},${c[2]},${a})`;
+
+/* ═══════════════════════════════════════════════════
+   DRAWING
+═══════════════════════════════════════════════════ */
+function drawScene(t) {
+  ctx.clearRect(0, 0, W, H);
+
+  /* Floor ambient light */
+  if (t > 0.01) {
+    const fg = ctx.createRadialGradient(LX, BASE_Y + 30, 0, LX, BASE_Y + 30, 200);
+    fg.addColorStop(0, `rgba(70,200,80,${t * 0.09})`);
+    fg.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = fg;
+    ctx.fillRect(0, 0, W, H);
+  }
+
+  /* Squish transform around base */
+  ctx.save();
+  ctx.translate(LX, BASE_Y);
+  ctx.scale(1, 1 + squish);
+  ctx.translate(-LX, -BASE_Y);
+
+  drawLightCone(t);
+  drawBase(t);
+  drawPole(t);
+  drawShade(t);
+  drawFace(t);
+  drawParticles(t);
+
+  ctx.restore();
+
+  drawRope(t);
+  drawKnob(t);
+}
+
+/* ── LIGHT CONE ── */
+function drawLightCone(t) {
+  if (t < 0.02) return;
+  const alpha = t * 0.16;
+  const cg = ctx.createRadialGradient(LX, SHADE_BOT_Y + 10, 5, LX, SHADE_BOT_Y + 100, 190);
+  cg.addColorStop(0, `rgba(130,240,100,${alpha * 1.4})`);
+  cg.addColorStop(0.4, `rgba(80,200,80,${alpha})`);
+  cg.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.save();
+  ctx.fillStyle = cg;
+  ctx.beginPath();
+  ctx.moveTo(LX - SHADE_BOT_W + 5, SHADE_BOT_Y + 8);
+  ctx.lineTo(LX - 150, H + 10);
+  ctx.lineTo(LX + 150, H + 10);
+  ctx.lineTo(LX + SHADE_BOT_W - 5, SHADE_BOT_Y + 8);
+  ctx.closePath();
+  ctx.fill();
+
+  // Hard cone edge lines (subtle)
+  ctx.strokeStyle = `rgba(100,220,80,${t * 0.08})`;
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(LX - SHADE_BOT_W + 5, SHADE_BOT_Y + 8);
+  ctx.lineTo(LX - 150, H + 10);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(LX + SHADE_BOT_W - 5, SHADE_BOT_Y + 8);
+  ctx.lineTo(LX + 150, H + 10);
+  ctx.stroke();
+  ctx.restore();
+}
+
+/* ── BASE ── */
+function drawBase(t) {
+  const col = lc([72,78,85],[82,88,95], t);
+  const grd = ctx.createLinearGradient(LX - BASE_RX, BASE_Y, LX + BASE_RX, BASE_Y);
+  grd.addColorStop(0,   rgba(lc([50,56,62],[58,64,70],t), 1));
+  grd.addColorStop(0.5, rgba(lc([88,96,105],[100,110,118],t), 1));
+  grd.addColorStop(1,   rgba(lc([50,56,62],[58,64,70],t), 1));
+  ctx.fillStyle = grd;
+  ctx.beginPath();
+  ctx.ellipse(LX, BASE_Y, BASE_RX, BASE_RY, 0, 0, Math.PI*2);
+  ctx.fill();
+  // Rim highlight
+  ctx.fillStyle = `rgba(255,255,255,${0.04 + t*0.03})`;
+  ctx.beginPath();
+  ctx.ellipse(LX, BASE_Y - 2, BASE_RX*0.55, BASE_RY*0.38, 0, 0, Math.PI*2);
+  ctx.fill();
+}
+
+/* ── POLE ── */
+function drawPole(t) {
+  const grd = ctx.createLinearGradient(LX - POLE_W/2, 0, LX + POLE_W/2, 0);
+  grd.addColorStop(0,   `rgb(55,62,70)`);
+  grd.addColorStop(0.35,`rgb(148,158,168)`);
+  grd.addColorStop(0.65,`rgb(120,130,140)`);
+  grd.addColorStop(1,   `rgb(50,57,65)`);
+  ctx.fillStyle = grd;
+  ctx.beginPath();
+  ctx.roundRect(LX - POLE_W/2, POLE_TOP_Y, POLE_W, POLE_BOT_Y - POLE_TOP_Y, [0,0,3,3]);
+  ctx.fill();
+}
+
+/* ── SHADE ── */
+function drawShade(t) {
+  const colOff = [36,40,46], colOn = [62,150,75];
+  const colDkOff = [20,24,28], colDkOn = [38,100,50];
+  const colLtOff = [55,62,70], colLtOn = [110,200,120];
+
+  const col   = lc(colOff, colOn, t);
+  const colDk = lc(colDkOff, colDkOn, t);
+  const colLt = lc(colLtOff, colLtOn, t);
+
+  // Main shade trapezoid
+  const grd = ctx.createLinearGradient(LX - SHADE_BOT_W, SHADE_TOP_Y, LX + SHADE_BOT_W, SHADE_BOT_Y);
+  grd.addColorStop(0,    rgba(colDk, 1));
+  grd.addColorStop(0.35, rgba(col, 1));
+  grd.addColorStop(0.65, rgba(col, 1));
+  grd.addColorStop(1,    rgba(colLt, 1));
+
+  ctx.fillStyle = grd;
+  ctx.beginPath();
+  ctx.moveTo(LX - SHADE_TOP_W, SHADE_TOP_Y + 6);
+  ctx.bezierCurveTo(
+    LX - SHADE_TOP_W - 8, SHADE_TOP_Y + 40,
+    LX - SHADE_BOT_W - 4, SHADE_BOT_Y - 30,
+    LX - SHADE_BOT_W,     SHADE_BOT_Y
+  );
+  ctx.lineTo(LX + SHADE_BOT_W, SHADE_BOT_Y);
+  ctx.bezierCurveTo(
+    LX + SHADE_BOT_W + 4, SHADE_BOT_Y - 30,
+    LX + SHADE_TOP_W + 8, SHADE_TOP_Y + 40,
+    LX + SHADE_TOP_W,     SHADE_TOP_Y + 6
+  );
+  ctx.closePath();
+  ctx.fill();
+
+  // Inner glow when on
+  if (t > 0.01) {
+    const ig = ctx.createRadialGradient(LX, SHADE_BOT_Y - 25, 0, LX, SHADE_BOT_Y - 25, 80);
+    ig.addColorStop(0, `rgba(200,255,170,${t * 0.3})`);
+    ig.addColorStop(0.6, `rgba(100,220,80,${t * 0.1})`);
+    ig.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.save();
+    ctx.fillStyle = ig;
+    ctx.beginPath();
+    ctx.moveTo(LX - SHADE_TOP_W + 6, SHADE_TOP_Y + 10);
+    ctx.lineTo(LX + SHADE_TOP_W - 6, SHADE_TOP_Y + 10);
+    ctx.lineTo(LX + SHADE_BOT_W - 6, SHADE_BOT_Y - 5);
+    ctx.lineTo(LX - SHADE_BOT_W + 6, SHADE_BOT_Y - 5);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  }
+
+  // Top rim ellipse
+  const rimTop = lc([55,62,70],[82,160,95],t);
+  ctx.fillStyle = rgba(rimTop, 1);
+  ctx.beginPath();
+  ctx.ellipse(LX, SHADE_TOP_Y + 6, SHADE_TOP_W, 8, 0, 0, Math.PI*2);
+  ctx.fill();
+  ctx.strokeStyle = rgba(lc([65,72,80],[100,180,112],t), 0.6);
+  ctx.lineWidth = 1.2;
+  ctx.stroke();
+
+  // Bottom rim ellipse
+  const rimBot = lc([44,50,56],[72,145,85],t);
+  ctx.fillStyle = rgba(rimBot, 1);
+  ctx.beginPath();
+  ctx.ellipse(LX, SHADE_BOT_Y, SHADE_BOT_W, 11, 0, 0, Math.PI*2);
+  ctx.fill();
+}
+
+/* ── FACE ── */
+function drawFace(t) {
+  const cx = LX;
+  const cy = SHADE_TOP_Y + (SHADE_BOT_Y - SHADE_TOP_Y) * 0.5;
+  const eyeY  = cy - 9;
+  const eyeGap = 19;
+
+  ctx.save();
+
+  if (t < 0.5) {
+    /* SLEEPY / OFF face */
+    const f = 1 - t * 2; // 1→0
+    // Sleepy half-circle eyes
+    for (const s of [-1, 1]) {
+      const ex = cx + s * eyeGap;
+      ctx.fillStyle = rgba([160,170,165], 0.5 + f * 0.4);
+      ctx.beginPath();
+      ctx.arc(ex, eyeY, 4.8, Math.PI, 0, false);
+      ctx.fill();
+      // Lids
+      ctx.strokeStyle = rgba([130,140,135], 0.7 + f * 0.3);
+      ctx.lineWidth = 2;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(ex - 5, eyeY);
+      ctx.lineTo(ex + 5, eyeY);
+      ctx.stroke();
+    }
+    // Frown
+    ctx.strokeStyle = rgba([120,130,125], 0.6);
+    ctx.lineWidth = 1.8; ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.arc(cx, cy + 6, 5.5, Math.PI * 0.25, Math.PI * 0.75, false);
+    ctx.stroke();
+
+  } else {
+    /* HAPPY / ON face */
+    const f = (t - 0.5) * 2; // 0→1
+
+    // Happy arch eyes  (∧ shape)
+    for (const s of [-1, 1]) {
+      const ex = cx + s * eyeGap;
+      ctx.strokeStyle = rgba([240,255,210], 0.85 + f * 0.15);
+      ctx.lineWidth = 2.8; ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.arc(ex, eyeY + 4, 5.5, Math.PI * 1.15, Math.PI * 1.85, false);
+      ctx.stroke();
+    }
+    // Big smile
+    ctx.strokeStyle = rgba([240,255,200], 0.75 + f * 0.25);
+    ctx.lineWidth = 2.2; ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.arc(cx, cy - 2, 11, Math.PI * 0.08, Math.PI * 0.92, false);
+    ctx.stroke();
+
+    // Blush cheeks
+    const ba = f * 0.52;
+    ctx.fillStyle = `rgba(255,118,90,${ba})`;
+    ctx.beginPath();
+    ctx.ellipse(cx - 28, cy + 1, 9, 5.5, 0.3, 0, Math.PI*2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.ellipse(cx + 28, cy + 1, 9, 5.5, -0.3, 0, Math.PI*2);
+    ctx.fill();
+  }
+
+  ctx.restore();
+}
+
+/* ── PARTICLES ── */
+function drawParticles(t) {
+  for (const p of particles) {
+    const alpha = p.life * 0.85;
+    const r = Math.max(0.001, p.r * p.life);
+    ctx.fillStyle = lampOn
+      ? `rgba(140,255,100,${alpha})`
+      : `rgba(200,220,200,${alpha})`;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
+
+/* ── ROPE ── */
+function drawRope(t) {
+  if (pts.length < 2) return;
+
+  const ropeCol = lc([86,96,101], [108,190,96], t);
+  const darkCol = lc([52,60,64], [74,142,78], t);
+  const lightCol = lc([128,138,144], [160,232,150], t);
+
+  function drawStrand(offsetPx, width, alpha, phase, color, shadowAlpha) {
+    ctx.save();
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.strokeStyle = rgba(color, alpha);
+    ctx.lineWidth = width;
+    ctx.shadowColor = rgba([60,200,60], shadowAlpha);
+    ctx.shadowBlur = 4;
+
+    ctx.beginPath();
+    for (let i = 0; i < pts.length; i++) {
+      const p = pts[i];
+      const prev = pts[Math.max(0, i - 1)];
+      const next = pts[Math.min(pts.length - 1, i + 1)];
+      const dx = next.x - prev.x;
+      const dy = next.y - prev.y;
+      const len = Math.hypot(dx, dy) || 1;
+      const nx = -dy / len;
+      const ny = dx / len;
+      const twist = Math.sin(i * 0.95 + phase) * 0.7;
+      const taper = 1 - i / (pts.length - 1);
+      const ox = nx * (offsetPx * (0.55 + taper * 0.45) + twist);
+      const oy = ny * (offsetPx * (0.55 + taper * 0.45) + twist);
+      if (i === 0) ctx.moveTo(p.x + ox, p.y + oy);
+      else ctx.lineTo(p.x + ox, p.y + oy);
+    }
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  // Base body of the rope
+  drawStrand(0, 8.5, 0.28 + t * 0.18, 0.0, darkCol, 0.06);
+  drawStrand(0, 5.2, 0.72, 1.7, ropeCol, 0.16);
+  drawStrand(0, 2.2, 0.85, 3.2, lightCol, 0.08);
+
+  // Tiny braided flecks to avoid the "stiff line" look
+  ctx.save();
+  for (let i = 1; i < pts.length - 1; i += 2) {
+    const p = pts[i];
+    const prev = pts[i - 1];
+    const next = pts[i + 1];
+    const dx = next.x - prev.x;
+    const dy = next.y - prev.y;
+    const len = Math.hypot(dx, dy) || 1;
+    const nx = -dy / len;
+    const ny = dx / len;
+    const side = i % 4 < 2 ? -1 : 1;
+    const x = p.x + nx * side * 2.1;
+    const y = p.y + ny * side * 2.1;
+    ctx.fillStyle = rgba(lightCol, 0.16);
+    ctx.beginPath();
+    ctx.arc(x, y, 0.8, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.restore();
+}
+
+/* ── KNOB ── */
+function drawKnob(t) {
+  const k = knob();
+  const hover = Math.hypot(mx - k.x, my - k.y) < 24 || dragPt !== null;
+
+  ctx.save();
+  ctx.shadowColor = hover
+    ? rgba(lc([150,160,165],[80,220,80],t), 0.7)
+    : rgba([0,0,0], 0.3);
+  ctx.shadowBlur  = hover ? 14 : 6;
+
+  // Outer knob
+  const kc = lc([65,75,80],[72,168,60],t);
+  ctx.fillStyle = rgba(kc, 1);
+  ctx.beginPath();
+  ctx.arc(k.x, k.y, hover ? 9 : 7.5, 0, Math.PI*2);
+  ctx.fill();
+
+  // Inner shine
+  const kh = lc([110,122,128],[140,230,110],t);
+  ctx.fillStyle = rgba(kh, 0.9);
+  ctx.beginPath();
+  ctx.arc(k.x - 2, k.y - 2, 3, 0, Math.PI*2);
+  ctx.fill();
+
+  // Hover ring
+  if (hover) {
+    ctx.strokeStyle = rgba(lc([130,140,145],[100,230,90],t), 0.45);
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(k.x, k.y, 13, 0, Math.PI*2);
+    ctx.stroke();
+  }
+
+  ctx.restore();
+}
+
+/* ── TOGGLE FLASH OVERLAY ── */
+function drawFlash() {
+  if (toggleFlash <= 0) return;
+  const a = toggleFlash * 0.25;
+  const c = lampOn ? [120,255,100] : [200,220,200];
+  ctx.fillStyle = `rgba(${c[0]},${c[1]},${c[2]},${a})`;
+  ctx.fillRect(0, 0, W, H);
+}
+
+/* ═══════════════════════════════════════════════════
+   MAIN LOOP
+═══════════════════════════════════════════════════ */
+function loop() {
+  // Smooth transition
+  const target = lampOn ? 1 : 0;
+  T += (target - T) * 0.055;
+  if (Math.abs(T - target) < 0.001) T = target;
+
+  // Squish spring
+  squishV += -squish * 0.14;
+  squishV *= 0.84;
+  squish  += squishV;
+  if (Math.abs(squish) < 0.0005 && Math.abs(squishV) < 0.0005) squish = 0;
+
+  // Flash decay
+  if (toggleFlash > 0) {
+    toggleFlash -= 0.055;
+    if (toggleFlash < 0) toggleFlash = 0;
+  }
+
+  stepRope();
+  updateParticles();
+
+  const t = ease(T);
+  drawScene(t);
+  drawFlash();
+
+  requestAnimationFrame(loop);
+}
+
+loop();
+
+/* ═══════════════════════════════════════════════════
+   BUTTON RIPPLE
+═══════════════════════════════════════════════════ */
+document.getElementById('login-btn').addEventListener('click', function(e) {
+  const rc = document.getElementById('ripple-container');
+  const r  = document.createElement('div');
+  r.className = 'ripple';
+  const rect = this.getBoundingClientRect();
+  const size = Math.max(rect.width, rect.height) * 1.2;
+  r.style.cssText = `
+    width:${size}px; height:${size}px;
+    left:${e.clientX - rect.left - size/2}px;
+    top:${e.clientY - rect.top  - size/2}px;
+  `;
+  rc.appendChild(r);
+  setTimeout(() => r.remove(), 600);
+});
+</script>
 </body>
 </html>
