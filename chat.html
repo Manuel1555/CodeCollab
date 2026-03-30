@@ -8,9 +8,12 @@
   <link rel="stylesheet" href="css/chat.css">
 </head>
 <body>
+  <div id="stars"></div>
+  <div class="glow-overlay"></div>
+
   <nav class="navbar">
     <div class="nav-brand">
-      <span class="logo">&#60;/&#62;</span>
+      <span class="logo">&lt;/&gt;</span>
       <span class="brand-name">CodeCollab</span>
     </div>
     <ul class="nav-links">
@@ -65,7 +68,7 @@
 
       <div class="chat-messages" id="chatMessages">
         <div class="message">
-          <div class="msg-avatar" style="background-color: #6366f1;">Y</div>
+          <div class="msg-avatar" style="background-color: #50c85a;">Y</div>
           <div class="msg-content">
             <div class="msg-header">
               <strong>You</strong>
@@ -98,7 +101,7 @@
         </div>
 
         <div class="message">
-          <div class="msg-avatar" style="background-color: #6366f1;">Y</div>
+          <div class="msg-avatar" style="background-color: #50c85a;">Y</div>
           <div class="msg-content">
             <div class="msg-header">
               <strong>You</strong>
@@ -138,7 +141,7 @@ const config = {
           ></textarea>
           <div class="chat-input-actions">
             <button class="btn-icon" title="Attach file">&#128206;</button>
-            <button class="btn-icon" title="Insert code block">&#60;/&#62;</button>
+            <button class="btn-icon" title="Insert code block">&lt;/&gt;</button>
             <button class="btn-icon btn-send" id="chatSendBtn" title="Send message">&#10148;</button>
           </div>
         </div>
@@ -146,6 +149,7 @@ const config = {
     </main>
   </div>
 
+  <script src="js/stars.js"></script>
   <script src="js/chat.js"></script>
 </body>
 </html>

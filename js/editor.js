@@ -112,7 +112,7 @@
     const msg = document.createElement("div");
     msg.className = "mini-msg";
     msg.innerHTML =
-      '<strong class="msg-user" style="color: #6366f1;">You</strong>' +
+      '<strong class="msg-user" style="color: #50c85a;">You</strong>' +
       "<span>" +
       escapeHtml(text) +
       "</span>";

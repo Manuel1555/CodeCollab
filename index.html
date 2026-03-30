@@ -8,9 +8,12 @@
   <link rel="stylesheet" href="css/landing.css">
 </head>
 <body>
+  <div id="stars"></div>
+  <div class="glow-overlay"></div>
+
   <nav class="navbar">
     <div class="nav-brand">
-      <span class="logo">&#60;/&#62;</span>
+      <span class="logo">&lt;/&gt;</span>
       <span class="brand-name">CodeCollab</span>
     </div>
     <ul class="nav-links">
@@ -22,68 +25,78 @@
 
   <main class="landing">
     <section class="hero">
-      <div class="hero-content">
+      <div class="hero-text">
         <h1>Code Together,<br>Build Together</h1>
-        <p class="hero-subtitle">
-          A real-time collaborative code editor with built-in chat.
-          Write, review, and ship code with your team — all in the browser.
-        </p>
+        <p class="hero-subtitle">A real-time collaborative editor with built-in team chat. Write, review, and ship code with your team — all in one place.</p>
         <div class="hero-actions">
           <a href="editor.html" class="btn btn-primary">Open Editor</a>
           <a href="chat.html" class="btn btn-secondary">Join Chat</a>
         </div>
       </div>
-      <div class="hero-visual">
-        <div class="code-window">
-          <div class="window-bar">
-            <span class="dot red"></span>
-            <span class="dot yellow"></span>
-            <span class="dot green"></span>
-            <span class="window-title">app.js</span>
+
+      <div class="mascot-wrapper">
+        <div class="mascot">
+          <div class="lamp-shade">
+            <div class="lamp-shade-top"></div>
+            <div class="lamp-face">
+              <div class="lamp-eyes">
+                <div class="lamp-eye"></div>
+                <div class="lamp-eye"></div>
+              </div>
+              <div class="lamp-mouth"></div>
+              <div class="lamp-cheeks">
+                <div class="lamp-cheek"></div>
+                <div class="lamp-cheek"></div>
+              </div>
+            </div>
           </div>
-          <pre class="code-preview"><code><span class="kw">function</span> <span class="fn">collaborate</span>() {
-  <span class="kw">const</span> team = <span class="str">"awesome"</span>;
-  <span class="kw">return</span> team.<span class="fn">build</span>(ideas);
-}</code></pre>
+          <div class="lamp-pole"></div>
+          <div class="lamp-base"></div>
+          <div class="lamp-light-cone"></div>
+          <div class="lamp-cord">
+            <div class="lamp-cord-knob"></div>
+          </div>
         </div>
       </div>
     </section>
 
     <section class="features">
-      <h2>Why CodeCollab?</h2>
+      <h2>Everything You Need</h2>
       <div class="feature-grid">
         <div class="feature-card">
           <div class="feature-icon">&#9998;</div>
-          <h3>Live Editing</h3>
-          <p>See changes in real time as your teammates type. Syntax highlighting for multiple languages.</p>
+          <h3>Live Editor</h3>
+          <p>Write code with syntax highlighting, tab support, and a multi-file workspace.</p>
         </div>
         <div class="feature-card">
           <div class="feature-icon">&#128172;</div>
-          <h3>Built-in Chat</h3>
-          <p>Discuss code without switching tabs. Mention teammates and share snippets inline.</p>
+          <h3>Team Chat</h3>
+          <p>Channel-based messaging with code block support and direct messages.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">&#128101;</div>
+          <h3>Collaborate</h3>
+          <p>Work on the same files together in real time. See changes as they happen.</p>
         </div>
         <div class="feature-card">
           <div class="feature-icon">&#127912;</div>
-          <h3>Themes &amp; Customization</h3>
-          <p>Choose from dark, light, or high-contrast themes. Customize fonts and key bindings.</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon">&#128640;</div>
-          <h3>Fast &amp; Lightweight</h3>
-          <p>No heavy frameworks. Pure HTML, CSS, and JavaScript — loads instantly.</p>
+          <h3>Dark Theme</h3>
+          <p>Easy on the eyes with a beautiful cartoon-themed dark interface.</p>
         </div>
       </div>
     </section>
 
     <section class="cta">
-      <h2>Ready to start coding?</h2>
+      <h2>Ready to Code?</h2>
       <p>Jump into the editor and start building with your team.</p>
       <a href="editor.html" class="btn btn-primary">Get Started</a>
     </section>
   </main>
 
   <footer class="footer">
-    <p>&copy; 2026 CodeCollab. Built for developers, by developers.</p>
+    &copy; 2025 CodeCollab. Built with love and pixels.
   </footer>
+
+  <script src="js/stars.js"></script>
 </body>
 </html>

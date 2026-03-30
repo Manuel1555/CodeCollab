@@ -54,7 +54,7 @@
     var msgDiv = document.createElement("div");
     msgDiv.className = "message";
     msgDiv.innerHTML =
-      '<div class="msg-avatar" style="background-color: #6366f1;">Y</div>' +
+      '<div class="msg-avatar" style="background-color: #50c85a;">Y</div>' +
       '<div class="msg-content">' +
       '<div class="msg-header">' +
       "<strong>You</strong>" +
@@ -96,7 +96,7 @@
     if (channelName !== "general") {
       chatMessages.innerHTML =
         '<div class="message">' +
-        '<div class="msg-avatar" style="background-color: #6366f1;">Y</div>' +
+        '<div class="msg-avatar" style="background-color: #50c85a;">Y</div>' +
         '<div class="msg-content">' +
         '<div class="msg-header"><strong>You</strong><span class="msg-time">Now</span></div>' +
         "<p>Switched to #" +
