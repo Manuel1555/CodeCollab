@@ -1,927 +1,374 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lamp Login</title>
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<title>CodeCollab Login</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&family=Patrick+Hand&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --bg: #0c1520;
-  --card: #111c2c;
-  --green: #50c85a;
-  --green2: #7de07a;
-  --green-glow: rgba(80,200,90,0.35);
-  --text: #dff0df;
-  --muted: #5a8060;
-  --input-bg: #09111d;
-  --border: rgba(80,200,90,0.12);
+  --bg: #0a0e1a;
+  --card: #12182b;
+  --accent: #6c63ff;
+  --accent2: #a78bfa;
+  --cyan: #22d3ee;
+  --text: #e2e8f0;
+  --muted: #6b7fa3;
+  --input-bg: #0d1220;
+  --border: rgba(108,99,255,0.15);
 }
 
 html, body {
   width: 100%; height: 100%;
   background: var(--bg);
-  font-family: 'Nunito', sans-serif;
+  font-family: 'Baloo 2', cursive, sans-serif;
   overflow: hidden;
   display: flex; align-items: center; justify-content: center;
 }
 
-/* Animated star field */
-#stars {
-  position: fixed; inset: 0; pointer-events: none; z-index: 0;
-  overflow: hidden;
-}
+#sky { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
 .star {
-  position: absolute;
-  background: #fff;
-  border-radius: 50%;
+  position: absolute; background: #fff; border-radius: 50%;
   animation: twinkle var(--d) ease-in-out infinite;
 }
 @keyframes twinkle {
-  0%,100% { opacity: var(--min); }
-  50% { opacity: var(--max); }
+  0%,100% { opacity: var(--lo); }
+  50% { opacity: var(--hi); }
 }
+.shooting-star {
+  position: absolute; width: 3px; height: 3px;
+  background: #fff; border-radius: 50%;
+  animation: shoot var(--dur) linear infinite;
+  animation-delay: var(--delay); opacity: 0;
+}
+.shooting-star::after {
+  content: ''; position: absolute;
+  top: 0; right: 100%; width: 60px; height: 1.5px;
+  background: linear-gradient(to left, #fff, transparent);
+}
+@keyframes shoot {
+  0% { transform: translate(0,0) rotate(-35deg); opacity: 0; }
+  5% { opacity: 1; } 15% { opacity: 1; }
+  30% { transform: translate(-400px,240px) rotate(-35deg); opacity: 0; }
+  100% { opacity: 0; }
+}
+
+#aurora {
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  opacity: 0; transition: opacity 1.5s ease;
+}
+body.on #aurora { opacity: 1; }
+.aurora-band {
+  position: absolute; border-radius: 50%;
+  filter: blur(80px);
+  animation: drift 8s ease-in-out infinite alternate;
+}
+.aurora-band:nth-child(1) { width:600px;height:200px;background:rgba(108,99,255,0.12);top:10%;left:-5%; }
+.aurora-band:nth-child(2) { width:500px;height:150px;background:rgba(34,211,238,0.08);top:20%;left:30%;animation-delay:-3s; }
+.aurora-band:nth-child(3) { width:400px;height:180px;background:rgba(167,139,250,0.1);bottom:15%;right:-5%;animation-delay:-5s; }
+@keyframes drift {
+  0% { transform: translateX(0) translateY(0) scale(1); }
+  100% { transform: translateX(40px) translateY(-20px) scale(1.1); }
+}
+
+.firefly {
+  position: fixed; width: 4px; height: 4px;
+  border-radius: 50%; pointer-events: none; z-index: 2;
+  opacity: 0; transition: opacity 1s;
+}
+body.on .firefly { opacity: 1; }
 
 #app {
   position: relative; z-index: 1;
-  display: flex; align-items: center; gap: 0;
-  width: min(720px, 96vw);
+  display: flex; align-items: center; gap: 10px;
+  width: min(780px, 96vw);
 }
 
-/* ── LEFT: canvas ── */
-#left {
-  flex: 0 0 290px;
-  height: 440px;
-  position: relative;
-  user-select: none;
+#lamp-wrap {
+  flex: 0 0 300px; height: 460px;
+  position: relative; user-select: none; cursor: default;
 }
-#lamp-canvas {
-  display: block;
-  width: 290px; height: 440px;
-}
+#lamp-canvas { display: block; width: 300px; height: 460px; }
 
-/* ── RIGHT: login card ── */
 #card {
-  flex: 1;
-  background: var(--card);
-  border-radius: 22px;
-  padding: 42px 38px;
+  flex: 1; background: var(--card);
+  border-radius: 24px; padding: 44px 40px;
   border: 1.5px solid var(--border);
-  position: relative;
-  overflow: hidden;
-  transition: border-color 0.8s, box-shadow 0.8s;
-}
-#card::before {
-  content: '';
-  position: absolute; inset: 0;
-  border-radius: 22px;
-  background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(80,200,90,0.07), transparent 70%);
-  opacity: 0;
-  transition: opacity 0.8s;
-  pointer-events: none;
+  position: relative; overflow: hidden;
+  transition: border-color 0.9s, box-shadow 0.9s;
 }
 body.on #card {
-  border-color: rgba(80,200,90,0.45);
-  box-shadow: 0 0 50px rgba(80,200,90,0.18), 0 0 100px rgba(80,200,90,0.06);
+  border-color: rgba(108,99,255,0.5);
+  box-shadow: 0 0 40px rgba(108,99,255,0.15), 0 0 80px rgba(34,211,238,0.06), 0 8px 32px rgba(0,0,0,0.3);
+}
+#card::before {
+  content: ''; position: absolute; inset: 0; border-radius: 24px;
+  background: radial-gradient(ellipse 90% 60% at 50% -10%, rgba(108,99,255,0.08), transparent 70%);
+  opacity: 0; transition: opacity 0.9s; pointer-events: none;
 }
 body.on #card::before { opacity: 1; }
 
-/* Neon corner accents */
-#card::after {
-  content: '';
-  position: absolute;
-  top: -1px; left: -1px; right: -1px; bottom: -1px;
-  border-radius: 22px;
-  background: none;
-  box-shadow: inset 0 0 0 1.5px transparent;
-  pointer-events: none;
-  transition: box-shadow 0.8s;
-}
-body.on #card::after {
-  box-shadow: inset 0 0 0 1.5px rgba(80,200,90,0.2);
-}
+.card-icon { text-align:center;font-size:36px;margin-bottom:6px;filter:grayscale(0.6);transition:filter 0.8s; }
+body.on .card-icon { filter: grayscale(0); }
 
-h1 {
-  color: var(--text);
-  font-size: 26px; font-weight: 800;
-  margin-bottom: 28px;
-  text-align: center;
-  letter-spacing: -0.3px;
-}
+h1 { color:var(--text);font-size:28px;font-weight:800;margin-bottom:6px;text-align:center;letter-spacing:-0.5px; }
+.subtitle { text-align:center;color:var(--muted);font-size:14px;margin-bottom:28px;font-family:'Patrick Hand',cursive;letter-spacing:0.3px; }
 
-.field { margin-bottom: 18px; }
-label {
-  display: block;
-  color: var(--muted);
-  font-size: 12px; font-weight: 700;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  margin-bottom: 7px;
-}
+.field { margin-bottom: 18px; position: relative; }
+.field-icon { position:absolute;left:14px;top:38px;font-size:16px;opacity:0.4;transition:opacity 0.3s; }
+.field:focus-within .field-icon { opacity: 0.8; }
+
+label { display:block;color:var(--muted);font-size:11px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;margin-bottom:7px; }
 input {
-  width: 100%;
-  background: var(--input-bg);
-  border: 1.5px solid rgba(255,255,255,0.07);
-  border-radius: 11px;
-  padding: 12px 15px;
-  color: var(--text);
-  font-family: 'Nunito', sans-serif;
-  font-size: 14px;
-  outline: none;
-  transition: border-color 0.3s, box-shadow 0.3s;
-  -webkit-appearance: none;
+  width:100%;background:var(--input-bg);border:1.5px solid rgba(255,255,255,0.06);
+  border-radius:12px;padding:13px 15px 13px 40px;color:var(--text);
+  font-family:'Baloo 2',sans-serif;font-size:14px;outline:none;
+  transition:border-color 0.3s, box-shadow 0.3s;
 }
-input::placeholder { color: rgba(255,255,255,0.18); }
-input:focus {
-  border-color: var(--green);
-  box-shadow: 0 0 0 3px rgba(80,200,90,0.14);
-}
+input::placeholder { color: rgba(255,255,255,0.15); }
+input:focus { border-color:var(--accent);box-shadow:0 0 0 3px rgba(108,99,255,0.15); }
 
 #login-btn {
-  width: 100%;
-  margin-top: 6px;
-  padding: 14px;
-  background: linear-gradient(135deg, var(--green), var(--green2));
-  border: none; border-radius: 11px;
-  color: #fff;
-  font-family: 'Nunito', sans-serif;
-  font-size: 15px; font-weight: 800;
-  cursor: pointer;
-  position: relative; overflow: hidden;
-  transition: transform 0.15s, box-shadow 0.3s, filter 0.3s;
-  letter-spacing: 0.3px;
+  width:100%;margin-top:8px;padding:14px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  border:none;border-radius:12px;color:#fff;font-family:'Baloo 2',sans-serif;
+  font-size:16px;font-weight:800;cursor:pointer;position:relative;overflow:hidden;
+  transition:transform 0.15s, box-shadow 0.3s;letter-spacing:0.5px;
 }
-#login-btn::after {
-  content: '';
-  position: absolute; inset: 0;
-  background: linear-gradient(180deg, rgba(255,255,255,0.15) 0%, transparent 60%);
-  pointer-events: none;
-}
-#login-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 28px rgba(80,200,90,0.5);
-  filter: brightness(1.08);
-}
+#login-btn::after { content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,0.15) 0%,transparent 60%);pointer-events:none; }
+#login-btn:hover { transform:translateY(-2px);box-shadow:0 8px 30px rgba(108,99,255,0.45); }
 #login-btn:active { transform: scale(0.97); }
 
-#ripple-container {
-  position: absolute; inset: 0; pointer-events: none; overflow: hidden; border-radius: 11px;
-}
-.ripple {
-  position: absolute;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.3);
-  transform: scale(0);
-  animation: ripple-anim 0.55s ease-out forwards;
-}
-@keyframes ripple-anim {
-  to { transform: scale(4); opacity: 0; }
-}
+#ripple-box { position:absolute;inset:0;pointer-events:none;overflow:hidden;border-radius:12px; }
+.ripple { position:absolute;border-radius:50%;background:rgba(255,255,255,0.35);transform:scale(0);animation:rip 0.6s ease-out forwards; }
+@keyframes rip { to { transform: scale(4); opacity: 0; } }
 
-.forgot {
-  text-align: center; margin-top: 14px;
-  color: var(--muted); font-size: 13px;
-  cursor: pointer;
-  transition: color 0.2s;
-  display: block;
-}
-.forgot:hover { color: var(--green); }
+.divider { display:flex;align-items:center;margin:20px 0;gap:12px; }
+.divider span { color:var(--muted);font-size:12px;font-weight:600;letter-spacing:1px;white-space:nowrap; }
+.divider::before, .divider::after { content:'';flex:1;height:1px;background:rgba(255,255,255,0.06); }
 
-/* Hint tooltip */
+.social-row { display:flex;gap:12px;justify-content:center; }
+.social-btn {
+  width:44px;height:44px;border-radius:12px;border:1.5px solid rgba(255,255,255,0.06);
+  background:var(--input-bg);display:flex;align-items:center;justify-content:center;
+  font-size:18px;cursor:pointer;transition:border-color 0.3s,transform 0.15s,background 0.3s;
+  color:var(--muted);font-weight:700;
+}
+.social-btn:hover { border-color:var(--accent);background:rgba(108,99,255,0.08);transform:translateY(-2px); }
+
+.card-footer { text-align:center;margin-top:18px;color:var(--muted);font-size:13px; }
+.card-footer a { color:var(--accent2);text-decoration:none;font-weight:700;cursor:pointer;transition:color 0.2s; }
+.card-footer a:hover { color: var(--cyan); }
+
 #hint {
-  position: absolute;
-  bottom: 28px; left: 50%;
-  transform: translateX(-50%);
-  color: rgba(100,160,100,0.5);
-  font-size: 11px; font-weight: 600;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  white-space: nowrap;
-  animation: hintpulse 2.5s ease-in-out infinite;
-  pointer-events: none;
-  opacity: 1; transition: opacity 0.5s;
+  position:absolute;bottom:12px;left:50%;transform:translateX(-50%);
+  color:rgba(108,99,255,0.45);font-size:11px;font-weight:600;
+  letter-spacing:1.2px;text-transform:uppercase;white-space:nowrap;
+  animation:pulse-hint 2.5s ease-in-out infinite;pointer-events:none;transition:opacity 0.5s;
 }
 body.on #hint { opacity: 0; }
-@keyframes hintpulse {
-  0%,100% { opacity: 0.3; }
-  50% { opacity: 0.7; }
-}
+@keyframes pulse-hint { 0%,100%{opacity:0.25;} 50%{opacity:0.65;} }
 
-/* Ambient page glow */
-#glow-overlay {
-  position: fixed; inset: 0; pointer-events: none; z-index: 0;
-  background: radial-gradient(ellipse 50% 70% at 30% 60%, rgba(60,170,70,0.07), transparent);
-  opacity: 0; transition: opacity 1.2s;
-}
-body.on #glow-overlay { opacity: 1; }
+.moth { position:fixed;font-size:14px;pointer-events:none;z-index:3;opacity:0;transition:opacity 1.2s; }
+body.on .moth { opacity: 0.6; }
 </style>
 </head>
 <body>
 
-<div id="stars"></div>
-<div id="glow-overlay"></div>
+<div id="sky"></div>
+<div id="aurora"><div class="aurora-band"></div><div class="aurora-band"></div><div class="aurora-band"></div></div>
 
 <div id="app">
-  <!-- LAMP CANVAS -->
-  <div id="left">
-    <canvas id="lamp-canvas" width="290" height="440"></canvas>
-    <div id="hint">↓ pull the cord ↓</div>
+  <div id="lamp-wrap">
+    <canvas id="lamp-canvas" width="300" height="460"></canvas>
+    <div id="hint">&#x2193; tug the cord &#x2193;</div>
   </div>
-
-  <!-- LOGIN CARD -->
   <div id="card">
-    <h1>Welcome Back</h1>
+    <div class="card-icon">&#128161;</div>
+    <h1>CodeCollab</h1>
+    <p class="subtitle">sign in to start building together</p>
     <div class="field">
-      <label>Username</label>
-      <input type="text" id="inp-user" placeholder="Enter your username" autocomplete="off">
+      <label>Email</label>
+      <span class="field-icon">&#9993;</span>
+      <input type="email" id="inp-email" placeholder="you@example.com" autocomplete="off">
     </div>
     <div class="field">
       <label>Password</label>
-      <input type="password" id="inp-pass" placeholder="Enter your password" autocomplete="off">
+      <span class="field-icon">&#128274;</span>
+      <input type="password" id="inp-pass" placeholder="your secret key" autocomplete="off">
     </div>
-    <button id="login-btn">
-      Login
-      <div id="ripple-container"></div>
-    </button>
-    <a class="forgot">Forgot Password?</a>
+    <button id="login-btn">Sign In<div id="ripple-box"></div></button>
+    <div class="divider"><span>or continue with</span></div>
+    <div class="social-row">
+      <div class="social-btn" title="GitHub">&#128025;</div>
+      <div class="social-btn" title="Google">G</div>
+      <div class="social-btn" title="GitLab">&#129418;</div>
+    </div>
+    <p class="card-footer">New here? <a>Create an account</a></p>
   </div>
 </div>
 
 <script>
-/* ═══════════════════════════════════════════════════
-   STARS
-═══════════════════════════════════════════════════ */
-const starsEl = document.getElementById('stars');
-for (let i = 0; i < 80; i++) {
-  const s = document.createElement('div');
-  s.className = 'star';
-  const size = Math.random() * 2 + 0.5;
-  s.style.cssText = `
-    width:${size}px; height:${size}px;
-    left:${Math.random()*100}%; top:${Math.random()*100}%;
-    --d:${2 + Math.random()*4}s;
-    --min:${0.05 + Math.random()*0.1};
-    --max:${0.3 + Math.random()*0.5};
-    animation-delay:${Math.random()*4}s;
-  `;
-  starsEl.appendChild(s);
-}
+/* === STARFIELD + SHOOTING STARS === */
+var sky=document.getElementById('sky');
+for(var i=0;i<100;i++){var s=document.createElement('div');s.className='star';var sz=Math.random()*2.5+0.5;s.style.cssText='width:'+sz+'px;height:'+sz+'px;left:'+Math.random()*100+'%%;top:'+Math.random()*100+'%%;--d:'+(2+Math.random()*5)+'s;--lo:'+(0.05+Math.random()*0.1)+';--hi:'+(0.3+Math.random()*0.6)+';animation-delay:'+Math.random()*5+'s;';sky.appendChild(s);}
+for(var i=0;i<4;i++){var s=document.createElement('div');s.className='shooting-star';s.style.cssText='left:'+(30+Math.random()*60)+'%%;top:'+Math.random()*30+'%%;--dur:'+(6+Math.random()*6)+'s;--delay:'+(i*3+Math.random()*3)+'s;';sky.appendChild(s);}
 
-/* ═══════════════════════════════════════════════════
-   CANVAS & STATE
-═══════════════════════════════════════════════════ */
-const canvas = document.getElementById('lamp-canvas');
-const ctx = canvas.getContext('2d');
-const W = 290, H = 440;
+/* === FIREFLIES === */
+var fireflies=[];
+for(var i=0;i<12;i++){var f=document.createElement('div');f.className='firefly';var hue=Math.random()>0.5?'250,99%%,70%%':'175,80%%,60%%';f.style.background='radial-gradient(circle,hsla('+hue+',0.8),transparent)';f.style.width=f.style.height=(3+Math.random()*4)+'px';f.style.boxShadow='0 0 6px hsla('+hue+',0.5)';document.body.appendChild(f);fireflies.push({el:f,x:Math.random()*window.innerWidth,y:Math.random()*window.innerHeight,vx:(Math.random()-0.5)*0.6,vy:(Math.random()-0.5)*0.6,phase:Math.random()*Math.PI*2});}
+function updateFireflies(t){for(var i=0;i<fireflies.length;i++){var ff=fireflies[i];ff.x+=ff.vx+Math.sin(t*0.001+ff.phase)*0.3;ff.y+=ff.vy+Math.cos(t*0.0013+ff.phase)*0.3;if(ff.x<0)ff.x=window.innerWidth;if(ff.x>window.innerWidth)ff.x=0;if(ff.y<0)ff.y=window.innerHeight;if(ff.y>window.innerHeight)ff.y=0;var pulse=0.3+0.7*(0.5+0.5*Math.sin(t*0.003+ff.phase));ff.el.style.transform='translate('+ff.x+'px,'+ff.y+'px)';ff.el.style.opacity=lampOn?pulse:0;}}
 
-let lampOn = false;
-let T = 0;           // 0→1 smooth transition
-let squish = 0;      // lamp bounce squish
-let squishV = 0;
-let toggleFlash = 0; // flash when toggling
+/* === MOTHS === */
+var moths=[];
+for(var i=0;i<3;i++){var m=document.createElement('div');m.className='moth';m.textContent='\uD83E\uDD8B';document.body.appendChild(m);moths.push({el:m,angle:(Math.PI*2/3)*i,radius:100+Math.random()*60,speed:0.006+Math.random()*0.004,wobble:Math.random()*Math.PI*2});}
+function updateMoths(t){var cx=window.innerWidth/2-100;var cy=window.innerHeight/2-30;for(var i=0;i<moths.length;i++){var m=moths[i];m.angle+=m.speed;var wobbleR=m.radius+Math.sin(t*0.002+m.wobble)*20;var x=cx+Math.cos(m.angle)*wobbleR;var y=cy+Math.sin(m.angle)*wobbleR*0.5;var rot=Math.sin(m.angle*2)*25;m.el.style.transform='translate('+x+'px,'+y+'px) rotate('+rot+'deg) scaleX('+(Math.cos(m.angle)>0?1:-1)+')';}}
 
-/* ═══════════════════════════════════════════════════
-   LAMP GEOMETRY
-═══════════════════════════════════════════════════ */
-const LX = 135;          // lamp center X
+/* === CANVAS SETUP === */
+var canvas=document.getElementById('lamp-canvas');
+var ctx=canvas.getContext('2d');
+var W=300,H=460;
+var lampOn=false,T=0,squish=0,squishV=0,toggleFlash=0,bounce=0;
 
-const SHADE_TOP_Y  = 62;
-const SHADE_BOT_Y  = 168;
-const SHADE_TOP_W  = 42;
-const SHADE_BOT_W  = 88;
-const SHADE_MID_W  = 72;
+/* === LAMP GEOMETRY === */
+var LX=140;
+var HEAD_TOP_Y=70,HEAD_BOT_Y=170,HEAD_TOP_W=36,HEAD_BOT_W=82;
+var NECK_TOP_Y=HEAD_BOT_Y,NECK_MID_X=LX+15,NECK_MID_Y=220,NECK_BOT_Y=280;
+var BASE_Y=320,BASE_RX=55,BASE_RY=12;
+var ANCHOR_X=LX+12,ANCHOR_Y=HEAD_BOT_Y-18;
 
-const POLE_W       = 13;
-const POLE_TOP_Y   = SHADE_BOT_Y - 4;
-const POLE_BOT_Y   = 305;
-const BASE_Y       = 314;
-const BASE_RX      = 52;
-const BASE_RY      = 10;
-
-// Rope anchor: inner right of shade, near pole
-const ANCHOR_X = LX + 8;
-const ANCHOR_Y = SHADE_BOT_Y - 22;
-
-/* ═══════════════════════════════════════════════════
-   ROPE PHYSICS  (Verlet + constraint relaxation)
-═══════════════════════════════════════════════════ */
-const N_SEG   = 20;
-const SEG_LEN = 8.8;
-const GRAVITY = 0.34;
-const DAMPING = 0.982;
-const ITERS   = 30;
-
-let pts = [];
-
-function initRope() {
-  pts = [];
-  for (let i = 0; i <= N_SEG; i++) {
-    const y = ANCHOR_Y + i * SEG_LEN;
-    pts.push({
-      x: ANCHOR_X, y,
-      px: ANCHOR_X, py: y - 0.4,
-      fixed: i === 0
-    });
-  }
-}
+/* === ROPE PHYSICS (Verlet) === */
+var N_SEG=18,SEG_LEN=9,GRAV=0.32,DAMP=0.98,ITERS=25;
+var pts=[];
+function initRope(){pts=[];for(var i=0;i<=N_SEG;i++){var y=ANCHOR_Y+i*SEG_LEN;pts.push({x:ANCHOR_X,y:y,px:ANCHOR_X,py:y-0.3,fixed:i===0});}}
 initRope();
 
-function stepRope() {
-  // Verlet integration
-  for (const p of pts) {
-    if (p.fixed || p === dragPt) continue;
-    const vx = (p.x - p.px) * DAMPING;
-    const vy = (p.y - p.py) * DAMPING;
-    p.px = p.x; p.py = p.y;
-    p.x += vx;
-    p.y += vy + GRAVITY;
-  }
+function stepRope(){for(var i=0;i<pts.length;i++){var p=pts[i];if(p.fixed||p===dragPt)continue;var vx=(p.x-p.px)*DAMP;var vy=(p.y-p.py)*DAMP;p.px=p.x;p.py=p.y;p.x+=vx;p.y+=vy+GRAV;}for(var k=0;k<ITERS;k++){pts[0].x=ANCHOR_X;pts[0].y=ANCHOR_Y;for(var i=0;i<pts.length-1;i++){var a=pts[i],b=pts[i+1];var dx=b.x-a.x,dy=b.y-a.y;var d=Math.hypot(dx,dy)||1e-9;var f=(d-SEG_LEN)/d*0.5;if(!a.fixed&&a!==dragPt){a.x+=dx*f;a.y+=dy*f;}if(!b.fixed&&b!==dragPt){b.x-=dx*f;b.y-=dy*f;}}}}
 
-  // Constraint relaxation
-  for (let k = 0; k < ITERS; k++) {
-    pts[0].x = ANCHOR_X;
-    pts[0].y = ANCHOR_Y;
+/* === DRAG === */
+var dragPt=null,dragStartY=0,knobDelta=0,mx=-999,my=-999;
+function getKnob(){return pts[pts.length-1];}
 
-    for (let i = 0; i < pts.length - 1; i++) {
-      const a = pts[i], b = pts[i+1];
-      const dx = b.x - a.x, dy = b.y - a.y;
-      const d  = Math.hypot(dx, dy) || 1e-9;
-      const f  = (d - SEG_LEN) / d * 0.5;
+function canvasXY(e){var r=canvas.getBoundingClientRect();var cx=e.touches?e.touches[0].clientX:e.clientX;var cy=e.touches?e.touches[0].clientY:e.clientY;return{x:(cx-r.left)*W/r.width,y:(cy-r.top)*H/r.height};}
+function nearKnob(x,y){var k=getKnob();return Math.hypot(x-k.x,y-k.y)<26;}
 
-      if (!a.fixed && a !== dragPt) {
-        a.x += dx * f;
-        a.y += dy * f;
-      }
-      if (!b.fixed && b !== dragPt) {
-        b.x -= dx * f;
-        b.y -= dy * f;
-      }
-    }
-  }
+canvas.addEventListener('mousedown',function(e){var p=canvasXY(e);if(nearKnob(p.x,p.y)){dragPt=getKnob();dragStartY=dragPt.y;knobDelta=0;canvas.style.cursor='grabbing';}});
+canvas.addEventListener('mousemove',function(e){var p=canvasXY(e);mx=p.x;my=p.y;if(dragPt){dragPt.x=p.x;dragPt.y=p.y;knobDelta=p.y-dragStartY;}else{canvas.style.cursor=nearKnob(p.x,p.y)?'grab':'default';}});
+canvas.addEventListener('mouseup',function(){if(dragPt){if(knobDelta>30)toggle();var k=getKnob();k.py=k.y+12;dragPt=null;}canvas.style.cursor='default';});
+canvas.addEventListener('mouseleave',function(){dragPt=null;});
+canvas.addEventListener('touchstart',function(e){e.preventDefault();var p=canvasXY(e);if(nearKnob(p.x,p.y)){dragPt=getKnob();dragStartY=dragPt.y;knobDelta=0;}},{passive:false});
+canvas.addEventListener('touchmove',function(e){e.preventDefault();if(!dragPt)return;var p=canvasXY(e);dragPt.x=p.x;dragPt.y=p.y;knobDelta=p.y-dragStartY;},{passive:false});
+canvas.addEventListener('touchend',function(){if(dragPt){if(knobDelta>30)toggle();var k=getKnob();k.py=k.y+12;dragPt=null;}});
+
+/* === TOGGLE === */
+function toggle(){lampOn=!lampOn;document.body.classList.toggle('on',lampOn);squish=0.25;squishV=-0.07;toggleFlash=1;bounce=0.3;spawnParticles();if(lampOn){spawnParticles();setTimeout(spawnParticles,150);}}
+
+/* === PARTICLES === */
+var particles=[];
+function spawnParticles(){var cx=LX,cy=HEAD_BOT_Y+10;for(var i=0;i<24;i++){var a=Math.random()*Math.PI*2;var sp=1.8+Math.random()*3.5;var hue=lampOn?250+Math.random()*40:40+Math.random()*20;particles.push({x:cx,y:cy,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-1.2,life:1,decay:0.02+Math.random()*0.02,r:1.5+Math.random()*3,hue:hue});}}
+function updateParticles(){particles=particles.filter(function(p){return p.life>0;});for(var i=0;i<particles.length;i++){var p=particles[i];p.x+=p.vx;p.y+=p.vy;p.vy+=0.05;p.vx*=0.97;p.vy*=0.97;p.life-=p.decay;}}
+
+/* === COLOR UTILS === */
+function lerp(a,b,t){return a+(b-a)*t;}
+function lerpColor(c1,c2,t){return'rgb('+(lerp(c1[0],c2[0],t)|0)+','+(lerp(c1[1],c2[1],t)|0)+','+(lerp(c1[2],c2[2],t)|0)+')';}
+var OFF_SHADE=[90,95,110],OFF_SHADE2=[70,75,90],OFF_POLE=[80,85,100],OFF_BASE=[65,70,85];
+var ON_SHADE=[108,99,255],ON_SHADE2=[80,70,220],ON_POLE=[100,110,180],ON_BASE=[90,100,160];
+
+/* === DRAWING === */
+function draw(ts){
+  ctx.clearRect(0,0,W,H);
+  T+=((lampOn?1:0)-T)*0.04;
+  squishV+=(-squish)*0.15;squish+=squishV;squishV*=0.85;
+  bounce*=0.92;var bOff=Math.sin(ts*0.01)*bounce*8;
+  toggleFlash*=0.88;
+  ctx.save();ctx.translate(0,bOff);
+  drawLightCone();drawBase();drawNeck();drawHead();drawFace(ts);drawParticlesOnCanvas();drawRope();drawKnob();
+  ctx.restore();drawFlash();
 }
 
-/* ═══════════════════════════════════════════════════
-   DRAG INTERACTION
-═══════════════════════════════════════════════════ */
-let dragPt    = null;
-let dragStartY = 0;
-let knobDelta  = 0;
-let mx = -999, my = -999;  // last mouse pos (canvas coords)
-
-const knob = () => pts[pts.length - 1];
-
-function canvasXY(e) {
-  const r  = canvas.getBoundingClientRect();
-  const sx = W / r.width, sy = H / r.height;
-  const cx = e.touches ? e.touches[0].clientX : e.clientX;
-  const cy = e.touches ? e.touches[0].clientY : e.clientY;
-  return { x: (cx - r.left)*sx, y: (cy - r.top)*sy };
+function drawLightCone(){
+  if(T<0.01)return;
+  var grad=ctx.createLinearGradient(LX,HEAD_BOT_Y,LX,H);var a=T*0.25;
+  grad.addColorStop(0,'rgba(108,99,255,'+a+')');
+  grad.addColorStop(0.3,'rgba(167,139,250,'+(a*0.5)+')');
+  grad.addColorStop(0.7,'rgba(34,211,238,'+(a*0.15)+')');
+  grad.addColorStop(1,'transparent');
+  ctx.beginPath();ctx.moveTo(LX-HEAD_BOT_W*0.5,HEAD_BOT_Y+5);ctx.lineTo(LX-HEAD_BOT_W*1.6,H);ctx.lineTo(LX+HEAD_BOT_W*1.6,H);ctx.lineTo(LX+HEAD_BOT_W*0.5,HEAD_BOT_Y+5);ctx.closePath();ctx.fillStyle=grad;ctx.fill();
 }
 
-function nearKnob(x, y) {
-  const k = knob();
-  return Math.hypot(x - k.x, y - k.y) < 24;
+function drawBase(){
+  var col=lerpColor(OFF_BASE,ON_BASE,T);ctx.save();ctx.translate(LX,BASE_Y);
+  ctx.beginPath();ctx.ellipse(0,8,BASE_RX+5,BASE_RY+3,0,0,Math.PI*2);ctx.fillStyle='rgba(0,0,0,0.3)';ctx.fill();
+  ctx.beginPath();ctx.ellipse(0,0,BASE_RX,BASE_RY,0,0,Math.PI*2);ctx.fillStyle=col;ctx.fill();
+  ctx.beginPath();ctx.ellipse(0,-2,BASE_RX-8,BASE_RY-3,0,Math.PI,Math.PI*2);ctx.strokeStyle='rgba(255,255,255,'+(0.08+T*0.1)+')';ctx.lineWidth=1.5;ctx.stroke();
+  ctx.restore();
 }
 
-// Mouse
-canvas.addEventListener('mousedown', e => {
-  const p = canvasXY(e);
-  if (nearKnob(p.x, p.y)) {
-    dragPt = knob();
-    dragStartY = dragPt.y;
-    knobDelta  = 0;
-    canvas.style.cursor = 'grabbing';
-  }
-});
-canvas.addEventListener('mousemove', e => {
-  const p = canvasXY(e);
-  mx = p.x; my = p.y;
-  if (dragPt) {
-    dragPt.x = p.x;
-    dragPt.y = p.y;
-    knobDelta = p.y - dragStartY;
-  } else {
-    canvas.style.cursor = nearKnob(p.x, p.y) ? 'grab' : 'default';
-  }
-});
-canvas.addEventListener('mouseup', () => {
-  if (dragPt) {
-    if (knobDelta > 28) toggle();
-    const k = knob();
-    k.py = k.y + 10; // give a kick upward
-    dragPt = null;
-  }
-  canvas.style.cursor = 'default';
-});
-canvas.addEventListener('mouseleave', () => { dragPt = null; });
-
-canvas.addEventListener('dblclick', () => {
-  for (let i = 0; i < 3; i++) {
-    setTimeout(() => {
-      spawnParticles();
-      toggleFlash = Math.max(toggleFlash, 0.7);
-    }, i * 90);
-  }
-});
-
-// Touch
-canvas.addEventListener('touchstart', e => {
-  e.preventDefault();
-  const p = canvasXY(e);
-  if (nearKnob(p.x, p.y)) {
-    dragPt = knob();
-    dragStartY = dragPt.y;
-    knobDelta  = 0;
-  }
-}, { passive: false });
-canvas.addEventListener('touchmove', e => {
-  e.preventDefault();
-  if (!dragPt) return;
-  const p = canvasXY(e);
-  dragPt.x = p.x; dragPt.y = p.y;
-  knobDelta = p.y - dragStartY;
-}, { passive: false });
-canvas.addEventListener('touchend', () => {
-  if (dragPt) {
-    if (knobDelta > 28) toggle();
-    const k = knob();
-    k.py = k.y + 10;
-    dragPt = null;
-  }
-});
-
-/* ═══════════════════════════════════════════════════
-   TOGGLE
-═══════════════════════════════════════════════════ */
-function toggle() {
-  lampOn = !lampOn;
-  document.body.classList.toggle('on', lampOn);
-  squish   = 0.22;
-  squishV  = -0.06;
-  toggleFlash = 1;
-  spawnParticles();
-  if (lampOn) {
-    spawnParticles();
-    setTimeout(spawnParticles, 120);
-  }
+function drawNeck(){
+  var col=lerpColor(OFF_POLE,ON_POLE,T);
+  ctx.beginPath();ctx.moveTo(LX,NECK_TOP_Y);ctx.quadraticCurveTo(NECK_MID_X+8,NECK_MID_Y,LX,NECK_BOT_Y);ctx.strokeStyle=col;ctx.lineWidth=10;ctx.lineCap='round';ctx.stroke();
+  ctx.beginPath();ctx.arc(NECK_MID_X+2,NECK_MID_Y,7,0,Math.PI*2);ctx.fillStyle=col;ctx.fill();
+  ctx.beginPath();ctx.arc(LX,NECK_BOT_Y,8,0,Math.PI*2);ctx.fillStyle=col;ctx.fill();
+  ctx.beginPath();ctx.moveTo(LX-5,NECK_BOT_Y);ctx.lineTo(LX-3,BASE_Y-BASE_RY);ctx.lineTo(LX+3,BASE_Y-BASE_RY);ctx.lineTo(LX+5,NECK_BOT_Y);ctx.fillStyle=col;ctx.fill();
 }
 
-/* ═══════════════════════════════════════════════════
-   PARTICLES  (sparkles on toggle)
-═══════════════════════════════════════════════════ */
-let particles = [];
-function spawnParticles() {
-  const cx = LX, cy = SHADE_BOT_Y + 10;
-  for (let i = 0; i < 20; i++) {
-    const angle = Math.random() * Math.PI * 2;
-    const speed = 1.5 + Math.random() * 3;
-    particles.push({
-      x: cx, y: cy,
-      vx: Math.cos(angle) * speed,
-      vy: Math.sin(angle) * speed - 1,
-      life: 1, decay: 0.025 + Math.random() * 0.02,
-      r: 1.5 + Math.random() * 2.5
+function drawHead(){
+  var col1=lerpColor(OFF_SHADE,ON_SHADE,T);var col2=lerpColor(OFF_SHADE2,ON_SHADE2,T);
+  ctx.save();ctx.translate(LX,(HEAD_TOP_Y+HEAD_BOT_Y)/2);ctx.scale(1+squish*0.5,1-squish*0.7);ctx.translate(-LX,-(HEAD_TOP_Y+HEAD_BOT_Y)/2);
+  var grad=ctx.createLinearGradient(LX,HEAD_TOP_Y,LX,HEAD_BOT_Y);grad.addColorStop(0,col1);grad.addColorStop(1,col2);
+  ctx.beginPath();ctx.moveTo(LX-HEAD_TOP_W,HEAD_TOP_Y+10);ctx.quadraticCurveTo(LX,HEAD_TOP_Y-8,LX+HEAD_TOP_W,HEAD_TOP_Y+10);ctx.lineTo(LX+HEAD_BOT_W,HEAD_BOT_Y);ctx.lineTo(LX-HEAD_BOT_W,HEAD_BOT_Y);ctx.closePath();ctx.fillStyle=grad;ctx.fill();
+  ctx.beginPath();ctx.moveTo(LX-HEAD_TOP_W+10,HEAD_TOP_Y+15);ctx.quadraticCurveTo(LX,HEAD_TOP_Y,LX+HEAD_TOP_W-10,HEAD_TOP_Y+15);ctx.strokeStyle='rgba(255,255,255,'+(0.06+T*0.12)+')';ctx.lineWidth=2;ctx.stroke();
+  ctx.beginPath();ctx.moveTo(LX-HEAD_BOT_W,HEAD_BOT_Y);ctx.lineTo(LX+HEAD_BOT_W,HEAD_BOT_Y);ctx.strokeStyle='rgba(255,255,255,'+(0.1+T*0.15)+')';ctx.lineWidth=2.5;ctx.stroke();
+  if(T>0.01){var ig=ctx.createRadialGradient(LX,HEAD_BOT_Y,0,LX,HEAD_BOT_Y,HEAD_BOT_W);ig.addColorStop(0,'rgba(167,139,250,'+(T*0.3)+')');ig.addColorStop(1,'transparent');ctx.beginPath();ctx.moveTo(LX-HEAD_BOT_W+5,HEAD_BOT_Y-2);ctx.lineTo(LX+HEAD_BOT_W-5,HEAD_BOT_Y-2);ctx.lineTo(LX+HEAD_TOP_W-5,HEAD_TOP_Y+20);ctx.lineTo(LX-HEAD_TOP_W+5,HEAD_TOP_Y+20);ctx.closePath();ctx.fillStyle=ig;ctx.fill();}
+  ctx.restore();
+}
+
+function drawFace(ts){
+  var cy=HEAD_TOP_Y+(HEAD_BOT_Y-HEAD_TOP_Y)*0.52;var eyeSpacing=22;var blink=Math.sin(ts*0.003)>0.97;
+  if(T<0.5){
+    var sleepT=1-T*2;
+    [-1,1].forEach(function(side){
+      var ex=LX+side*eyeSpacing;
+      ctx.beginPath();ctx.moveTo(ex-8,cy-2);ctx.quadraticCurveTo(ex,cy+4,ex+8,cy-2);ctx.strokeStyle='rgba(220,220,240,'+(0.5*sleepT)+')';ctx.lineWidth=2;ctx.stroke();
+      if(sleepT>0.5){var zt=(ts*0.001+side)%%3;ctx.font=(10+zt*2)+"px 'Baloo 2'";ctx.fillStyle='rgba(167,139,250,'+Math.max(0,0.5-zt*0.2)+')';ctx.fillText('z',ex+side*15,cy-12-zt*12);}
     });
-  }
-}
-function updateParticles() {
-  particles = particles.filter(p => p.life > 0);
-  for (const p of particles) {
-    p.x += p.vx; p.y += p.vy;
-    p.vy += 0.06;
-    p.vx *= 0.97; p.vy *= 0.97;
-    p.life -= p.decay;
-  }
-}
-
-/* ═══════════════════════════════════════════════════
-   COLOR UTILS
-═══════════════════════════════════════════════════ */
-function lerp(a, b, t) { return a + (b - a) * t; }
-function ease(t) { return t < .5 ? 2*t*t : -1+(4-2*t)*t; }
-function lc(a, b, t) {
-  return [
-    Math.round(lerp(a[0],b[0],t)),
-    Math.round(lerp(a[1],b[1],t)),
-    Math.round(lerp(a[2],b[2],t))
-  ];
-}
-const rgb  = c => `rgb(${c[0]},${c[1]},${c[2]})`;
-const rgba = (c,a) => `rgba(${c[0]},${c[1]},${c[2]},${a})`;
-
-/* ═══════════════════════════════════════════════════
-   DRAWING
-═══════════════════════════════════════════════════ */
-function drawScene(t) {
-  ctx.clearRect(0, 0, W, H);
-
-  /* Floor ambient light */
-  if (t > 0.01) {
-    const fg = ctx.createRadialGradient(LX, BASE_Y + 30, 0, LX, BASE_Y + 30, 200);
-    fg.addColorStop(0, `rgba(70,200,80,${t * 0.09})`);
-    fg.addColorStop(1, 'rgba(0,0,0,0)');
-    ctx.fillStyle = fg;
-    ctx.fillRect(0, 0, W, H);
-  }
-
-  /* Squish transform around base */
-  ctx.save();
-  ctx.translate(LX, BASE_Y);
-  ctx.scale(1, 1 + squish);
-  ctx.translate(-LX, -BASE_Y);
-
-  drawLightCone(t);
-  drawBase(t);
-  drawPole(t);
-  drawShade(t);
-  drawFace(t);
-  drawParticles(t);
-
-  ctx.restore();
-
-  drawRope(t);
-  drawKnob(t);
-}
-
-/* ── LIGHT CONE ── */
-function drawLightCone(t) {
-  if (t < 0.02) return;
-  const alpha = t * 0.16;
-  const cg = ctx.createRadialGradient(LX, SHADE_BOT_Y + 10, 5, LX, SHADE_BOT_Y + 100, 190);
-  cg.addColorStop(0, `rgba(130,240,100,${alpha * 1.4})`);
-  cg.addColorStop(0.4, `rgba(80,200,80,${alpha})`);
-  cg.addColorStop(1, 'rgba(0,0,0,0)');
-  ctx.save();
-  ctx.fillStyle = cg;
-  ctx.beginPath();
-  ctx.moveTo(LX - SHADE_BOT_W + 5, SHADE_BOT_Y + 8);
-  ctx.lineTo(LX - 150, H + 10);
-  ctx.lineTo(LX + 150, H + 10);
-  ctx.lineTo(LX + SHADE_BOT_W - 5, SHADE_BOT_Y + 8);
-  ctx.closePath();
-  ctx.fill();
-
-  // Hard cone edge lines (subtle)
-  ctx.strokeStyle = `rgba(100,220,80,${t * 0.08})`;
-  ctx.lineWidth = 1;
-  ctx.beginPath();
-  ctx.moveTo(LX - SHADE_BOT_W + 5, SHADE_BOT_Y + 8);
-  ctx.lineTo(LX - 150, H + 10);
-  ctx.stroke();
-  ctx.beginPath();
-  ctx.moveTo(LX + SHADE_BOT_W - 5, SHADE_BOT_Y + 8);
-  ctx.lineTo(LX + 150, H + 10);
-  ctx.stroke();
-  ctx.restore();
-}
-
-/* ── BASE ── */
-function drawBase(t) {
-  const col = lc([72,78,85],[82,88,95], t);
-  const grd = ctx.createLinearGradient(LX - BASE_RX, BASE_Y, LX + BASE_RX, BASE_Y);
-  grd.addColorStop(0,   rgba(lc([50,56,62],[58,64,70],t), 1));
-  grd.addColorStop(0.5, rgba(lc([88,96,105],[100,110,118],t), 1));
-  grd.addColorStop(1,   rgba(lc([50,56,62],[58,64,70],t), 1));
-  ctx.fillStyle = grd;
-  ctx.beginPath();
-  ctx.ellipse(LX, BASE_Y, BASE_RX, BASE_RY, 0, 0, Math.PI*2);
-  ctx.fill();
-  // Rim highlight
-  ctx.fillStyle = `rgba(255,255,255,${0.04 + t*0.03})`;
-  ctx.beginPath();
-  ctx.ellipse(LX, BASE_Y - 2, BASE_RX*0.55, BASE_RY*0.38, 0, 0, Math.PI*2);
-  ctx.fill();
-}
-
-/* ── POLE ── */
-function drawPole(t) {
-  const grd = ctx.createLinearGradient(LX - POLE_W/2, 0, LX + POLE_W/2, 0);
-  grd.addColorStop(0,   `rgb(55,62,70)`);
-  grd.addColorStop(0.35,`rgb(148,158,168)`);
-  grd.addColorStop(0.65,`rgb(120,130,140)`);
-  grd.addColorStop(1,   `rgb(50,57,65)`);
-  ctx.fillStyle = grd;
-  ctx.beginPath();
-  ctx.roundRect(LX - POLE_W/2, POLE_TOP_Y, POLE_W, POLE_BOT_Y - POLE_TOP_Y, [0,0,3,3]);
-  ctx.fill();
-}
-
-/* ── SHADE ── */
-function drawShade(t) {
-  const colOff = [36,40,46], colOn = [62,150,75];
-  const colDkOff = [20,24,28], colDkOn = [38,100,50];
-  const colLtOff = [55,62,70], colLtOn = [110,200,120];
-
-  const col   = lc(colOff, colOn, t);
-  const colDk = lc(colDkOff, colDkOn, t);
-  const colLt = lc(colLtOff, colLtOn, t);
-
-  // Main shade trapezoid
-  const grd = ctx.createLinearGradient(LX - SHADE_BOT_W, SHADE_TOP_Y, LX + SHADE_BOT_W, SHADE_BOT_Y);
-  grd.addColorStop(0,    rgba(colDk, 1));
-  grd.addColorStop(0.35, rgba(col, 1));
-  grd.addColorStop(0.65, rgba(col, 1));
-  grd.addColorStop(1,    rgba(colLt, 1));
-
-  ctx.fillStyle = grd;
-  ctx.beginPath();
-  ctx.moveTo(LX - SHADE_TOP_W, SHADE_TOP_Y + 6);
-  ctx.bezierCurveTo(
-    LX - SHADE_TOP_W - 8, SHADE_TOP_Y + 40,
-    LX - SHADE_BOT_W - 4, SHADE_BOT_Y - 30,
-    LX - SHADE_BOT_W,     SHADE_BOT_Y
-  );
-  ctx.lineTo(LX + SHADE_BOT_W, SHADE_BOT_Y);
-  ctx.bezierCurveTo(
-    LX + SHADE_BOT_W + 4, SHADE_BOT_Y - 30,
-    LX + SHADE_TOP_W + 8, SHADE_TOP_Y + 40,
-    LX + SHADE_TOP_W,     SHADE_TOP_Y + 6
-  );
-  ctx.closePath();
-  ctx.fill();
-
-  // Inner glow when on
-  if (t > 0.01) {
-    const ig = ctx.createRadialGradient(LX, SHADE_BOT_Y - 25, 0, LX, SHADE_BOT_Y - 25, 80);
-    ig.addColorStop(0, `rgba(200,255,170,${t * 0.3})`);
-    ig.addColorStop(0.6, `rgba(100,220,80,${t * 0.1})`);
-    ig.addColorStop(1, 'rgba(0,0,0,0)');
-    ctx.save();
-    ctx.fillStyle = ig;
-    ctx.beginPath();
-    ctx.moveTo(LX - SHADE_TOP_W + 6, SHADE_TOP_Y + 10);
-    ctx.lineTo(LX + SHADE_TOP_W - 6, SHADE_TOP_Y + 10);
-    ctx.lineTo(LX + SHADE_BOT_W - 6, SHADE_BOT_Y - 5);
-    ctx.lineTo(LX - SHADE_BOT_W + 6, SHADE_BOT_Y - 5);
-    ctx.closePath();
-    ctx.fill();
-    ctx.restore();
-  }
-
-  // Top rim ellipse
-  const rimTop = lc([55,62,70],[82,160,95],t);
-  ctx.fillStyle = rgba(rimTop, 1);
-  ctx.beginPath();
-  ctx.ellipse(LX, SHADE_TOP_Y + 6, SHADE_TOP_W, 8, 0, 0, Math.PI*2);
-  ctx.fill();
-  ctx.strokeStyle = rgba(lc([65,72,80],[100,180,112],t), 0.6);
-  ctx.lineWidth = 1.2;
-  ctx.stroke();
-
-  // Bottom rim ellipse
-  const rimBot = lc([44,50,56],[72,145,85],t);
-  ctx.fillStyle = rgba(rimBot, 1);
-  ctx.beginPath();
-  ctx.ellipse(LX, SHADE_BOT_Y, SHADE_BOT_W, 11, 0, 0, Math.PI*2);
-  ctx.fill();
-}
-
-/* ── FACE ── */
-function drawFace(t) {
-  const cx = LX;
-  const cy = SHADE_TOP_Y + (SHADE_BOT_Y - SHADE_TOP_Y) * 0.5;
-  const eyeY  = cy - 9;
-  const eyeGap = 19;
-
-  ctx.save();
-
-  if (t < 0.5) {
-    /* SLEEPY / OFF face */
-    const f = 1 - t * 2; // 1→0
-    // Sleepy half-circle eyes
-    for (const s of [-1, 1]) {
-      const ex = cx + s * eyeGap;
-      ctx.fillStyle = rgba([160,170,165], 0.5 + f * 0.4);
-      ctx.beginPath();
-      ctx.arc(ex, eyeY, 4.8, Math.PI, 0, false);
-      ctx.fill();
-      // Lids
-      ctx.strokeStyle = rgba([130,140,135], 0.7 + f * 0.3);
-      ctx.lineWidth = 2;
-      ctx.lineCap = 'round';
-      ctx.beginPath();
-      ctx.moveTo(ex - 5, eyeY);
-      ctx.lineTo(ex + 5, eyeY);
-      ctx.stroke();
-    }
-    // Frown
-    ctx.strokeStyle = rgba([120,130,125], 0.6);
-    ctx.lineWidth = 1.8; ctx.lineCap = 'round';
-    ctx.beginPath();
-    ctx.arc(cx, cy + 6, 5.5, Math.PI * 0.25, Math.PI * 0.75, false);
-    ctx.stroke();
-
-  } else {
-    /* HAPPY / ON face */
-    const f = (t - 0.5) * 2; // 0→1
-
-    // Happy arch eyes  (∧ shape)
-    for (const s of [-1, 1]) {
-      const ex = cx + s * eyeGap;
-      ctx.strokeStyle = rgba([240,255,210], 0.85 + f * 0.15);
-      ctx.lineWidth = 2.8; ctx.lineCap = 'round';
-      ctx.beginPath();
-      ctx.arc(ex, eyeY + 4, 5.5, Math.PI * 1.15, Math.PI * 1.85, false);
-      ctx.stroke();
-    }
-    // Big smile
-    ctx.strokeStyle = rgba([240,255,200], 0.75 + f * 0.25);
-    ctx.lineWidth = 2.2; ctx.lineCap = 'round';
-    ctx.beginPath();
-    ctx.arc(cx, cy - 2, 11, Math.PI * 0.08, Math.PI * 0.92, false);
-    ctx.stroke();
-
-    // Blush cheeks
-    const ba = f * 0.52;
-    ctx.fillStyle = `rgba(255,118,90,${ba})`;
-    ctx.beginPath();
-    ctx.ellipse(cx - 28, cy + 1, 9, 5.5, 0.3, 0, Math.PI*2);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.ellipse(cx + 28, cy + 1, 9, 5.5, -0.3, 0, Math.PI*2);
-    ctx.fill();
-  }
-
-  ctx.restore();
-}
-
-/* ── PARTICLES ── */
-function drawParticles(t) {
-  for (const p of particles) {
-    const alpha = p.life * 0.85;
-    const r = Math.max(0.001, p.r * p.life);
-    ctx.fillStyle = lampOn
-      ? `rgba(140,255,100,${alpha})`
-      : `rgba(200,220,200,${alpha})`;
-    ctx.beginPath();
-    ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
-    ctx.fill();
+    ctx.beginPath();ctx.moveTo(LX-8,cy+18);ctx.quadraticCurveTo(LX,cy+14,LX+8,cy+18);ctx.strokeStyle='rgba(220,220,240,'+(0.35*sleepT)+')';ctx.lineWidth=1.8;ctx.stroke();
+  }else{
+    var happyT=(T-0.5)*2;
+    [-1,1].forEach(function(side){
+      var ex=LX+side*eyeSpacing;
+      if(blink){ctx.beginPath();ctx.moveTo(ex-7,cy);ctx.lineTo(ex+7,cy);ctx.strokeStyle='rgba(255,255,255,'+(0.8*happyT)+')';ctx.lineWidth=2;ctx.stroke();}
+      else{ctx.beginPath();ctx.arc(ex,cy,7,0,Math.PI*2);ctx.fillStyle='rgba(255,255,255,'+(0.9*happyT)+')';ctx.fill();ctx.beginPath();ctx.arc(ex+1,cy+1,3.5,0,Math.PI*2);ctx.fillStyle='rgba(30,20,60,'+(0.9*happyT)+')';ctx.fill();ctx.beginPath();ctx.arc(ex+3,cy-2,1.5,0,Math.PI*2);ctx.fillStyle='rgba(255,255,255,'+(0.9*happyT)+')';ctx.fill();}
+      ctx.beginPath();ctx.ellipse(ex+side*10,cy+10,8,5,0,0,Math.PI*2);ctx.fillStyle='rgba(250,130,180,'+(0.25*happyT)+')';ctx.fill();
+    });
+    ctx.beginPath();ctx.arc(LX,cy+8,12,0.15*Math.PI,0.85*Math.PI);ctx.strokeStyle='rgba(255,255,255,'+(0.75*happyT)+')';ctx.lineWidth=2;ctx.stroke();
+    if(happyT>0.5){var sparkAlpha=(happyT-0.5)*2;for(var i=0;i<4;i++){var ang=ts*0.002+i*Math.PI*0.5;var sr=50+Math.sin(ts*0.004+i)*10;var sx=LX+Math.cos(ang)*sr;var sy=cy-20+Math.sin(ang)*sr*0.4;drawSparkle(sx,sy,3+Math.sin(ts*0.005+i)*1.5,sparkAlpha*0.5);}}
   }
 }
 
-/* ── ROPE ── */
-function drawRope(t) {
-  if (pts.length < 2) return;
+function drawSparkle(x,y,size,alpha){ctx.save();ctx.translate(x,y);ctx.strokeStyle='rgba(167,139,250,'+alpha+')';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(0,-size);ctx.lineTo(0,size);ctx.moveTo(-size,0);ctx.lineTo(size,0);var d=size*0.6;ctx.moveTo(-d,-d);ctx.lineTo(d,d);ctx.moveTo(d,-d);ctx.lineTo(-d,d);ctx.stroke();ctx.restore();}
 
-  const ropeCol = lc([86,96,101], [108,190,96], t);
-  const darkCol = lc([52,60,64], [74,142,78], t);
-  const lightCol = lc([128,138,144], [160,232,150], t);
+function drawParticlesOnCanvas(){updateParticles();for(var i=0;i<particles.length;i++){var p=particles[i];ctx.beginPath();ctx.arc(p.x,p.y,p.r*p.life,0,Math.PI*2);ctx.fillStyle='hsla('+p.hue+',80%%,70%%,'+(p.life*0.8)+')';ctx.fill();}}
 
-  function drawStrand(offsetPx, width, alpha, phase, color, shadowAlpha) {
-    ctx.save();
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-    ctx.strokeStyle = rgba(color, alpha);
-    ctx.lineWidth = width;
-    ctx.shadowColor = rgba([60,200,60], shadowAlpha);
-    ctx.shadowBlur = 4;
+function drawRope(){for(var strand=-1;strand<=1;strand++){ctx.beginPath();ctx.moveTo(pts[0].x+strand*1.5,pts[0].y);for(var i=1;i<pts.length;i++){var wave=Math.sin(i*0.8+strand*2)*1.5;ctx.lineTo(pts[i].x+strand*1.5+wave,pts[i].y);}ctx.strokeStyle='rgba('+(lerp(120,167,T)|0)+','+(lerp(125,139,T)|0)+','+(lerp(140,250,T)|0)+','+(0.25+strand*0.05)+')';ctx.lineWidth=1.8;ctx.stroke();}}
 
-    ctx.beginPath();
-    for (let i = 0; i < pts.length; i++) {
-      const p = pts[i];
-      const prev = pts[Math.max(0, i - 1)];
-      const next = pts[Math.min(pts.length - 1, i + 1)];
-      const dx = next.x - prev.x;
-      const dy = next.y - prev.y;
-      const len = Math.hypot(dx, dy) || 1;
-      const nx = -dy / len;
-      const ny = dx / len;
-      const twist = Math.sin(i * 0.95 + phase) * 0.7;
-      const taper = 1 - i / (pts.length - 1);
-      const ox = nx * (offsetPx * (0.55 + taper * 0.45) + twist);
-      const oy = ny * (offsetPx * (0.55 + taper * 0.45) + twist);
-      if (i === 0) ctx.moveTo(p.x + ox, p.y + oy);
-      else ctx.lineTo(p.x + ox, p.y + oy);
-    }
-    ctx.stroke();
-    ctx.restore();
-  }
-
-  // Base body of the rope
-  drawStrand(0, 8.5, 0.28 + t * 0.18, 0.0, darkCol, 0.06);
-  drawStrand(0, 5.2, 0.72, 1.7, ropeCol, 0.16);
-  drawStrand(0, 2.2, 0.85, 3.2, lightCol, 0.08);
-
-  // Tiny braided flecks to avoid the "stiff line" look
-  ctx.save();
-  for (let i = 1; i < pts.length - 1; i += 2) {
-    const p = pts[i];
-    const prev = pts[i - 1];
-    const next = pts[i + 1];
-    const dx = next.x - prev.x;
-    const dy = next.y - prev.y;
-    const len = Math.hypot(dx, dy) || 1;
-    const nx = -dy / len;
-    const ny = dx / len;
-    const side = i % 4 < 2 ? -1 : 1;
-    const x = p.x + nx * side * 2.1;
-    const y = p.y + ny * side * 2.1;
-    ctx.fillStyle = rgba(lightCol, 0.16);
-    ctx.beginPath();
-    ctx.arc(x, y, 0.8, 0, Math.PI * 2);
-    ctx.fill();
-  }
-  ctx.restore();
+function drawKnob(){
+  var k=getKnob();var hovering=Math.hypot(mx-k.x,my-k.y)<26;var r=hovering?8:6.5;
+  if(hovering||T>0.3){ctx.beginPath();ctx.arc(k.x,k.y,r+6,0,Math.PI*2);ctx.fillStyle='rgba(108,99,255,'+(hovering?0.2:T*0.1)+')';ctx.fill();}
+  var grad=ctx.createRadialGradient(k.x-2,k.y-2,0,k.x,k.y,r);grad.addColorStop(0,lerpColor([160,160,180],[167,139,250],T));grad.addColorStop(1,lerpColor([100,105,120],[108,99,255],T));ctx.beginPath();ctx.arc(k.x,k.y,r,0,Math.PI*2);ctx.fillStyle=grad;ctx.fill();
+  ctx.beginPath();ctx.arc(k.x-2,k.y-2,r*0.35,0,Math.PI*2);ctx.fillStyle='rgba(255,255,255,'+(0.3+T*0.2)+')';ctx.fill();
 }
 
-/* ── KNOB ── */
-function drawKnob(t) {
-  const k = knob();
-  const hover = Math.hypot(mx - k.x, my - k.y) < 24 || dragPt !== null;
+function drawFlash(){if(toggleFlash<0.01)return;ctx.fillStyle=lampOn?'rgba(108,99,255,'+(toggleFlash*0.35)+')':'rgba(255,255,255,'+(toggleFlash*0.2)+')';ctx.fillRect(0,0,W,H);}
 
-  ctx.save();
-  ctx.shadowColor = hover
-    ? rgba(lc([150,160,165],[80,220,80],t), 0.7)
-    : rgba([0,0,0], 0.3);
-  ctx.shadowBlur  = hover ? 14 : 6;
+/* === MAIN LOOP === */
+function loop(ts){stepRope();draw(ts);updateFireflies(ts);updateMoths(ts);requestAnimationFrame(loop);}
+requestAnimationFrame(loop);
 
-  // Outer knob
-  const kc = lc([65,75,80],[72,168,60],t);
-  ctx.fillStyle = rgba(kc, 1);
-  ctx.beginPath();
-  ctx.arc(k.x, k.y, hover ? 9 : 7.5, 0, Math.PI*2);
-  ctx.fill();
-
-  // Inner shine
-  const kh = lc([110,122,128],[140,230,110],t);
-  ctx.fillStyle = rgba(kh, 0.9);
-  ctx.beginPath();
-  ctx.arc(k.x - 2, k.y - 2, 3, 0, Math.PI*2);
-  ctx.fill();
-
-  // Hover ring
-  if (hover) {
-    ctx.strokeStyle = rgba(lc([130,140,145],[100,230,90],t), 0.45);
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.arc(k.x, k.y, 13, 0, Math.PI*2);
-    ctx.stroke();
-  }
-
-  ctx.restore();
-}
-
-/* ── TOGGLE FLASH OVERLAY ── */
-function drawFlash() {
-  if (toggleFlash <= 0) return;
-  const a = toggleFlash * 0.25;
-  const c = lampOn ? [120,255,100] : [200,220,200];
-  ctx.fillStyle = `rgba(${c[0]},${c[1]},${c[2]},${a})`;
-  ctx.fillRect(0, 0, W, H);
-}
-
-/* ═══════════════════════════════════════════════════
-   MAIN LOOP
-═══════════════════════════════════════════════════ */
-function loop() {
-  // Smooth transition
-  const target = lampOn ? 1 : 0;
-  T += (target - T) * 0.055;
-  if (Math.abs(T - target) < 0.001) T = target;
-
-  // Squish spring
-  squishV += -squish * 0.14;
-  squishV *= 0.84;
-  squish  += squishV;
-  if (Math.abs(squish) < 0.0005 && Math.abs(squishV) < 0.0005) squish = 0;
-
-  // Flash decay
-  if (toggleFlash > 0) {
-    toggleFlash -= 0.055;
-    if (toggleFlash < 0) toggleFlash = 0;
-  }
-
-  stepRope();
-  updateParticles();
-
-  const t = ease(T);
-  drawScene(t);
-  drawFlash();
-
-  requestAnimationFrame(loop);
-}
-
-loop();
-
-/* ═══════════════════════════════════════════════════
-   BUTTON RIPPLE
-═══════════════════════════════════════════════════ */
-document.getElementById('login-btn').addEventListener('click', function(e) {
-  const rc = document.getElementById('ripple-container');
-  const r  = document.createElement('div');
-  r.className = 'ripple';
-  const rect = this.getBoundingClientRect();
-  const size = Math.max(rect.width, rect.height) * 1.2;
-  r.style.cssText = `
-    width:${size}px; height:${size}px;
-    left:${e.clientX - rect.left - size/2}px;
-    top:${e.clientY - rect.top  - size/2}px;
-  `;
-  rc.appendChild(r);
-  setTimeout(() => r.remove(), 600);
-});
+/* === BUTTON RIPPLE === */
+document.getElementById('login-btn').addEventListener('click',function(e){var r=this.getBoundingClientRect();var ripple=document.createElement('div');ripple.className='ripple';var size=Math.max(r.width,r.height)*2;ripple.style.cssText='width:'+size+'px;height:'+size+'px;left:'+(e.clientX-r.left-size/2)+'px;top:'+(e.clientY-r.top-size/2)+'px;';document.getElementById('ripple-box').appendChild(ripple);setTimeout(function(){ripple.remove();},600);});
 </script>
 </body>
 </html>
